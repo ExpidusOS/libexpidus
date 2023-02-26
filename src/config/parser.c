@@ -324,34 +324,14 @@ NtTypeArgument* expidus_config_parser_read_file(ExpidusConfigParser* self, const
 
   nt_backtrace_push(backtrace, expidus_config_parser_read_file);
 
-  FILE* fp = fopen(path, "rb");
-  if (fp == NULL) {
-    NtString* str = nt_string_new(NULL);
-    assert(str != NULL);
-
-    int e = errno;
-    nt_string_dynamic_printf(str, "Failed to open \"%s\" for reading: (%d) %s", path, e, strerror(e));
-    const char* msg = nt_string_get_value(str, NULL);
-    nt_type_instance_unref((NtTypeInstance*)str);
-
-    *error = nt_error_new(msg, backtrace);
-    free((char*)msg);
+  const char* buff = nt_read_file(path, backtrace, error);
+  if (buff == NULL) {
     nt_backtrace_pop(backtrace);
     return NULL;
   }
 
-  fseek(fp, 0, SEEK_END);
-  size_t length = ftell(fp);
-  fseek(fp, 0, SEEK_SET);
-
-  char* buff = malloc(length);
-  assert(buff != NULL);
-
-  assert(fread(buff, 1, length, fp) == length);
-  fclose(fp);
-
   NtTypeArgument* arguments = expidus_config_parser_read(self, buff, backtrace, error);
-  free(buff);
+  free((char*)buff);
   nt_backtrace_pop(backtrace);
   return arguments;
 }
