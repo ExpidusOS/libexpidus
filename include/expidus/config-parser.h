@@ -91,6 +91,33 @@ void expidus_config_parser_add_property(ExpidusConfigParser* self, const char* n
 void expidus_config_parser_set_properties(ExpidusConfigParser* self, ExpidusConfigProperty* props);
 
 /**
+ * expidus_config_parser_get:
+ * @self: Instance
+ * @arguments: The parsed properties
+ * @name: Name of the property
+ * @backtrace: The backtrace to append to in case of an error
+ * @error: Pointer to store the error in
+ *
+ * Gets the value of a property or its default
+ *
+ * Returns: An %NtValue
+ */
+NtValue expidus_config_parser_get(ExpidusConfigParser* self, NtTypeArgument* arguments, const char* name, NtBacktrace* backtrace, NtError** error);
+
+/**
+ * expidus_config_parser_get_default:
+ * @self: Instance
+ * @name: Name of the property
+ * @backtrace: The backtrace to append to in case of an error
+ * @error: Pointer to store the error in
+ *
+ * Gets the default value of a property.
+ *
+ * Returns: An %NtValue of the default value
+ */
+NtValue expidus_config_parser_get_default(ExpidusConfigParser* self, const char* name, NtBacktrace* backtrace, NtError** error);
+
+/**
  * expidus_config_parser_read_line:
  * @self: Instance
  * @str: The string to read as a single line

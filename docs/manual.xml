@@ -19,6 +19,7 @@
   <chapter>
     <title>API Reference</title>
     <xi:include href="xml/config-parser.xml" />
+    <xi:include href="xml/vendor-config.xml" />
   </chapter>
 
   <index id="api-index-full">

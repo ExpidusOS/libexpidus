@@ -101,6 +101,59 @@ void expidus_config_parser_set_properties(ExpidusConfigParser* self, ExpidusConf
   }
 }
 
+NtValue expidus_config_parser_get(ExpidusConfigParser* self, NtTypeArgument* arguments, const char* name, NtBacktrace* backtrace, NtError** error) {
+  assert(EXPIDUS_IS_CONFIG_PARSER(self));
+  assert(backtrace != NULL);
+  assert(error != NULL && *error == NULL);
+
+  nt_backtrace_push(backtrace, expidus_config_parser_get);
+
+  NtValue default_value = expidus_config_parser_get_default(self, name, backtrace, error);
+  if (*error != NULL) {
+    nt_backtrace_pop(backtrace);
+    return NT_VALUE_POINTER(NULL);
+  }
+
+  NtValue value = nt_type_argument_get(arguments, name, default_value);
+  nt_backtrace_pop(backtrace);
+  return value;
+}
+
+NtValue expidus_config_parser_get_default(ExpidusConfigParser* self, const char* name, NtBacktrace* backtrace, NtError** error) {
+  assert(EXPIDUS_IS_CONFIG_PARSER(self));
+  assert(backtrace != NULL);
+  assert(error != NULL && *error == NULL);
+
+  nt_backtrace_push(backtrace, expidus_config_parser_get_default);
+
+  for (NtList* head = self->priv->list; head != NULL; head = head->next) {
+    assert(head->value.type == NT_VALUE_TYPE_POINTER);
+
+    ExpidusConfigProperty* prop = head->value.data.pointer;
+    assert(prop != NULL);
+
+    if (strcmp(prop->name, name) == 0) {
+      nt_backtrace_pop(backtrace);
+
+      NtValue value = {};
+      value.type = prop->type;
+      value.data = prop->default_value;
+      return value;
+    }
+  }
+
+  NtString* str = nt_string_new(NULL);
+  assert(str != NULL);
+  nt_string_dynamic_printf(str, "Property \"%s\" does not exist", name);
+  const char* msg = nt_string_get_value(str, NULL);
+  nt_type_instance_unref((NtTypeInstance*)str);
+
+  *error = nt_error_new(msg, backtrace);
+  free((char*)msg);
+  nt_backtrace_pop(backtrace);
+  return NT_VALUE_POINTER(NULL);
+}
+
 NtTypeArgument expidus_config_parser_read_line(ExpidusConfigParser* self, const char* str, size_t length, NtBacktrace* backtrace, NtError** error) {
   assert(EXPIDUS_IS_CONFIG_PARSER(self));
   assert(str != NULL && length > -1);

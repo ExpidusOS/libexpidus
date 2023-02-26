@@ -83,7 +83,7 @@ neutron = dependency('neutron-elemental', required: true)
 build_conf = configure_file(input: 'src/build.h.in', output: 'libexpidus-build.h',
   configuration: conf_data)
 
-libexpidus_sources = ['src/config/parser.c']
+libexpidus_sources = ['src/config/parser.c', 'src/config/vendor.c']
 libexpidus_deps = [neutron]
 libexpidus_cflags = []
 libexpidus_inc = include_directories('include')
