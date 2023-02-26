@@ -63,6 +63,7 @@ NtTypeArgument* expidus_vendor_config_load(NtBacktrace* backtrace, NtError** err
 
   const char* loc = expidus_vendor_config_get_path(EXPIDUS_VENDOR_CONFIG_SYSTEM);
 
+  nt_backtrace_sync(backtrace);
   NtTypeArgument* vendor_config = expidus_config_parser_read_file(parser, loc, backtrace, error);
   if (vendor_config == NULL) {
     nt_type_instance_unref((NtTypeInstance*)parser);
@@ -70,6 +71,7 @@ NtTypeArgument* expidus_vendor_config_load(NtBacktrace* backtrace, NtError** err
     return NULL;
   }
 
+  nt_backtrace_sync(backtrace);
   NtValue value = expidus_config_parser_get(parser, vendor_config, NT_TYPE_ARGUMENT_KEY(VendorConfig, datafs), backtrace, error);
   if (*error != NULL) {
     for (size_t i = 0; vendor_config[i].name != NULL; i++) {
@@ -87,6 +89,8 @@ NtTypeArgument* expidus_vendor_config_load(NtBacktrace* backtrace, NtError** err
   assert(value.type == NT_VALUE_TYPE_BOOL);
   if (value.data.boolean) {
     const char* loc = expidus_vendor_config_get_path(EXPIDUS_VENDOR_CONFIG_DATA);
+
+    nt_backtrace_sync(backtrace);
     NtTypeArgument* datafs_vendor_config = expidus_config_parser_read_file(parser, loc, backtrace, error);
     if (datafs_vendor_config == NULL) {
       for (size_t i = 0; vendor_config[i].name != NULL; i++) {

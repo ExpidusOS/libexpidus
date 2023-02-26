@@ -108,6 +108,7 @@ NtValue expidus_config_parser_get(ExpidusConfigParser* self, NtTypeArgument* arg
 
   nt_backtrace_push(backtrace, expidus_config_parser_get);
 
+  nt_backtrace_sync(backtrace);
   NtValue default_value = expidus_config_parser_get_default(self, name, backtrace, error);
   if (*error != NULL) {
     nt_backtrace_pop(backtrace);
@@ -142,6 +143,7 @@ NtValue expidus_config_parser_get_default(ExpidusConfigParser* self, const char*
     }
   }
 
+  nt_backtrace_sync(backtrace);
   NtString* str = nt_string_new(NULL);
   assert(str != NULL);
   nt_string_dynamic_printf(str, "Property \"%s\" does not exist", name);
@@ -198,6 +200,7 @@ NtTypeArgument expidus_config_parser_read_line(ExpidusConfigParser* self, const 
         if (strcmp(value, "true") == 0) arg.value = NT_VALUE_BOOL(true);
         else if (strcmp(value, "false") == 0) arg.value = NT_VALUE_BOOL(false);
         else {
+          nt_backtrace_sync(backtrace);
           NtString* str = nt_string_new(NULL);
           assert(str != NULL);
           nt_string_dynamic_printf(str, "Invalid boolean value \"%s\" for property \"%s\"", value, prop->name);
@@ -243,9 +246,11 @@ NtTypeArgument* expidus_config_parser_read(ExpidusConfigParser* self, const char
     memcpy(tmp, curr, curr_len);
     tmp[curr_len] = '\0';
 
+    nt_backtrace_sync(backtrace);
     NtTypeArgument arg = expidus_config_parser_read_line(self, tmp, curr_len, backtrace, error);
     if (arg.name == NULL) {
       if (*error == NULL) {
+        nt_backtrace_sync(backtrace);
         NtString* str = nt_string_new(NULL);
         assert(str != NULL);
         nt_string_dynamic_printf(str, "Invalid configuration on line %zu", count);
@@ -285,9 +290,11 @@ NtTypeArgument* expidus_config_parser_read(ExpidusConfigParser* self, const char
     memcpy(tmp, curr, curr_len);
     tmp[curr_len] = '\0';
 
+    nt_backtrace_sync(backtrace);
     NtTypeArgument arg = expidus_config_parser_read_line(self, tmp, curr_len, backtrace, error);
     if (arg.name == NULL) {
       if (*error == NULL) {
+        nt_backtrace_sync(backtrace);
         NtString* str = nt_string_new(NULL);
         assert(str != NULL);
         nt_string_dynamic_printf(str, "Invalid configuration on line %zu", count);
@@ -324,12 +331,14 @@ NtTypeArgument* expidus_config_parser_read_file(ExpidusConfigParser* self, const
 
   nt_backtrace_push(backtrace, expidus_config_parser_read_file);
 
+  nt_backtrace_sync(backtrace);
   const char* buff = nt_read_file(path, backtrace, error);
   if (buff == NULL) {
     nt_backtrace_pop(backtrace);
     return NULL;
   }
 
+  nt_backtrace_sync(backtrace);
   NtTypeArgument* arguments = expidus_config_parser_read(self, buff, backtrace, error);
   free((char*)buff);
   nt_backtrace_pop(backtrace);
