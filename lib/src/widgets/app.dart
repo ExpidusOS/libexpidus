@@ -13,6 +13,11 @@ class ExpidusApp extends StatefulWidget {
     super.key,
     this.title = '',
     this.onGenerateTitle,
+    this.navigatorObservers = const <NavigatorObserver>[],
+    this.localizationsDelegates,
+    this.localeListResolutionCallback,
+    this.localeResolutionCallback,
+    this.supportedLocales = const <Locale>[Locale('en', 'US')],
     this.home,
     this.routes = const <String, WidgetBuilder>{},
     this.initialRoute,
@@ -24,6 +29,11 @@ class ExpidusApp extends StatefulWidget {
 
   final String title;
   final GenerateAppTitle? onGenerateTitle;
+  final List<NavigatorObserver> navigatorObservers;
+  final Iterable<LocalizationsDelegate>? localizationsDelegates;
+  final LocaleListResolutionCallback? localeListResolutionCallback;
+  final LocaleResolutionCallback? localeResolutionCallback;
+  final Iterable<Locale> supportedLocales, 
   final Widget? home;
   final Map<String, WidgetBuilder> routes;
   final String? initialRoute;
@@ -63,6 +73,11 @@ class _ExpidusAppState extends State<ExpidusApp> {
         key: appKey,
         title: widget.title,
         onGenerateTitle: widget.onGenerateTitle,
+        navigatorObservers: widget.navigatorObservers,
+        localizationsDelegates: widget.localizationsDelegates,
+        localeListResolutionCallback: widget.localeListResolutionCallback,
+        localeResolutionCallback: widget.localeResolutionCallback,
+        supportedLocales: widget.supportedLocales,
         home: widget.home != null
             ? ExpidusThemeManager(child: widget.home!)
             : null,

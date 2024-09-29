@@ -26,6 +26,7 @@ typedef CircularProgressIndicator = material.CircularProgressIndicator;
 typedef Flap = AdwFlap;
 typedef HeaderButton = AdwHeaderButton;
 typedef LinearProgressIndicator = material.LinearProgressIndicator;
+typedef material = material.Material;
 typedef PopupMenu = GtkPopupMenu;
 typedef PreferencesGroup = AdwPreferencesGroup;
 typedef RefreshProgressIndicator = material.RefreshProgressIndicator;
