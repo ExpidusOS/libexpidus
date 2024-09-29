@@ -33,7 +33,7 @@ class ExpidusApp extends StatefulWidget {
   final Iterable<LocalizationsDelegate>? localizationsDelegates;
   final LocaleListResolutionCallback? localeListResolutionCallback;
   final LocaleResolutionCallback? localeResolutionCallback;
-  final Iterable<Locale> supportedLocales, 
+  final Iterable<Locale> supportedLocales;
   final Widget? home;
   final Map<String, WidgetBuilder> routes;
   final String? initialRoute;
