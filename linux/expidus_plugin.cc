@@ -36,6 +36,9 @@ static FlValue* get_style_color(GtkStyleContext* context, const gchar* color_nam
 static FlValue* get_color_theme(GtkStyleContext* context) {
   FlValue* colors = fl_value_new_map();
 
+  fl_value_set_string_take(colors, "accent", get_style_color(context, "accent_bg_color"));
+  fl_value_set_string_take(colors, "onAccent", get_style_color(context, "accent_fg_color"));
+
   fl_value_set_string_take(colors, "outline", get_style_color(context, "borders"));
 
   fl_value_set_string_take(colors, "primary", get_style_color(context, "theme_bg_color"));
@@ -105,6 +108,15 @@ static void expidus_plugin_handle_method_call(
     g_object_unref(context);
 
     response = FL_METHOD_RESPONSE(fl_method_success_response_new(theme));
+  } else if (strcmp(method, "getHeaderBarLayout") == 0) {
+    FlView* view = fl_plugin_registrar_get_view(self->registrar);
+
+    GtkSettings* settings = gtk_settings_get_for_screen(gtk_widget_get_screen(GTK_WIDGET(view)));
+
+    gchar* decor_layout = nullptr;
+    g_object_get(G_OBJECT(settings), "gtk-decoration-layout", &decor_layout, nullptr);
+
+    response = FL_METHOD_RESPONSE(fl_method_success_response_new(fl_value_new_string(decor_layout)));
   } else {
     response = FL_METHOD_RESPONSE(fl_method_not_implemented_response_new());
   }

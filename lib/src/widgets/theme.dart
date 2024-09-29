@@ -90,38 +90,44 @@ class ExpidusThemeManagerState extends State<ExpidusThemeManager> {
       headlineLarge: TextStyle(
         color: _fromMap(data['text']['color'].cast<String, int>()),
         fontSize: 32,
+        fontStyle: FontStyle.italic,
       ),
       headlineMedium: TextStyle(
         color: _fromMap(data['text']['color'].cast<String, int>()),
         fontSize: 28,
+        fontStyle: FontStyle.italic,
       ),
       headlineSmall: TextStyle(
         color: _fromMap(data['text']['color'].cast<String, int>()),
         fontSize: 24,
+        fontStyle: FontStyle.italic,
       ),
       titleLarge: TextStyle(
         color: _fromMap(data['text']['color'].cast<String, int>()),
-        fontSize: 22,
+        fontSize: 24,
+        fontWeight: FontWeight.bold,
       ),
       titleMedium: TextStyle(
         color: _fromMap(data['text']['color'].cast<String, int>()),
-        fontSize: 16,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
       ),
       titleSmall: TextStyle(
         color: _fromMap(data['text']['color'].cast<String, int>()),
-        fontSize: 14,
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
       ),
       bodyLarge: TextStyle(
         color: _fromMap(data['text']['color'].cast<String, int>()),
-        fontSize: 14,
+        fontSize: 17,
       ),
       bodyMedium: TextStyle(
         color: _fromMap(data['text']['color'].cast<String, int>()),
-        fontSize: 12,
+        fontSize: 15,
       ),
       bodySmall: TextStyle(
         color: _fromMap(data['text']['color'].cast<String, int>()),
-        fontSize: 11,
+        fontSize: 12,
       ),
       labelLarge: TextStyle(
         color: _fromMap(data['text']['color'].cast<String, int>()),
@@ -138,7 +144,6 @@ class ExpidusThemeManagerState extends State<ExpidusThemeManager> {
     );
 
     return ThemeData(
-      applyElevationOverlayColor: false,
       fontFamily: data['text']['font'],
       colorScheme: colorScheme,
       textTheme: textTheme,
@@ -149,8 +154,18 @@ class ExpidusThemeManagerState extends State<ExpidusThemeManager> {
             _fromMap(data['appBar']['foreground'].cast<String, int>()),
         shadowColor: _fromMap(data['appBar']['shadow'].cast<String, int>()),
         shape: Border.all(
-            width: 2.0,
+            width: 1.0,
             color: _fromMap(data['appBar']['border'].cast<String, int>())),
+      ),
+      buttonTheme: ButtonThemeData(
+        buttonColor:
+            _fromMap(data['colorScheme']['accent'].cast<String, int>()),
+        colorScheme: colorScheme.copyWith(
+            primary:
+                _fromMap(data['colorScheme']['accent'].cast<String, int>()),
+            onPrimary:
+                _fromMap(data['colorScheme']['onAccent'].cast<String, int>())),
+        padding: const EdgeInsets.all(6.0),
       ),
     );
   }
