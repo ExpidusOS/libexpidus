@@ -1,6 +1,7 @@
 import 'package:adwaita/adwaita.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:libadwaita/libadwaita.dart';
 import 'package:libadwaita_bitsdojo/libadwaita_bitsdojo.dart';
 
@@ -75,76 +76,75 @@ class ExpidusThemeManagerState extends State<ExpidusThemeManager> {
     );
 
     final textTheme = TextTheme(
-      displayLarge: TextStyle(
+      displayLarge: GoogleFonts.mPlus1p(
         color: _fromMap(data['text']['color'].cast<String, int>()),
         fontSize: 57,
       ),
-      displayMedium: TextStyle(
+      displayMedium: GoogleFonts.mPlus1p(
         color: _fromMap(data['text']['color'].cast<String, int>()),
         fontSize: 45,
       ),
-      displaySmall: TextStyle(
+      displaySmall: GoogleFonts.mPlus1p(
         color: _fromMap(data['text']['color'].cast<String, int>()),
         fontSize: 36,
       ),
-      headlineLarge: TextStyle(
+      headlineLarge: GoogleFonts.mPlus1p(
         color: _fromMap(data['text']['color'].cast<String, int>()),
         fontSize: 32,
         fontStyle: FontStyle.italic,
       ),
-      headlineMedium: TextStyle(
+      headlineMedium: GoogleFonts.mPlus1p(
         color: _fromMap(data['text']['color'].cast<String, int>()),
         fontSize: 28,
         fontStyle: FontStyle.italic,
       ),
-      headlineSmall: TextStyle(
+      headlineSmall: GoogleFonts.mPlus1p(
         color: _fromMap(data['text']['color'].cast<String, int>()),
         fontSize: 24,
         fontStyle: FontStyle.italic,
       ),
-      titleLarge: TextStyle(
+      titleLarge: GoogleFonts.mPlus1p(
         color: _fromMap(data['text']['color'].cast<String, int>()),
         fontSize: 24,
         fontWeight: FontWeight.bold,
       ),
-      titleMedium: TextStyle(
+      titleMedium: GoogleFonts.mPlus1p(
         color: _fromMap(data['text']['color'].cast<String, int>()),
         fontSize: 20,
         fontWeight: FontWeight.bold,
       ),
-      titleSmall: TextStyle(
+      titleSmall: GoogleFonts.mPlus1p(
         color: _fromMap(data['text']['color'].cast<String, int>()),
         fontSize: 18,
         fontWeight: FontWeight.bold,
       ),
-      bodyLarge: TextStyle(
+      bodyLarge: GoogleFonts.mPlus1p(
         color: _fromMap(data['text']['color'].cast<String, int>()),
         fontSize: 17,
       ),
-      bodyMedium: TextStyle(
+      bodyMedium: GoogleFonts.mPlus1p(
         color: _fromMap(data['text']['color'].cast<String, int>()),
         fontSize: 15,
       ),
-      bodySmall: TextStyle(
+      bodySmall: GoogleFonts.mPlus1p(
         color: _fromMap(data['text']['color'].cast<String, int>()),
         fontSize: 12,
       ),
-      labelLarge: TextStyle(
+      labelLarge: GoogleFonts.mPlus1p(
         color: _fromMap(data['text']['color'].cast<String, int>()),
         fontSize: 16,
       ),
-      labelMedium: TextStyle(
+      labelMedium: GoogleFonts.mPlus1p(
         color: _fromMap(data['text']['color'].cast<String, int>()),
         fontSize: 14,
       ),
-      labelSmall: TextStyle(
+      labelSmall: GoogleFonts.mPlus1p(
         color: _fromMap(data['text']['color'].cast<String, int>()),
         fontSize: 12,
       ),
     );
 
     return ThemeData(
-      fontFamily: data['text']['font'],
       colorScheme: colorScheme,
       textTheme: textTheme,
       appBarTheme: AppBarTheme(

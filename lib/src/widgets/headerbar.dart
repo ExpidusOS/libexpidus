@@ -13,7 +13,8 @@ class HeaderBar extends StatefulWidget {
     this.onGenerateTitle,
     this.start = const [],
     this.end = const [],
-    this.menuItems = const [],
+    this.hasDrawer = false,
+    this.onDrawerToggle,
     this.showActions,
   });
 
@@ -22,7 +23,8 @@ class HeaderBar extends StatefulWidget {
   final GenerateAppTitle? onGenerateTitle;
   final List<Widget> start;
   final List<Widget> end;
-  final List<PopupMenuEntry> menuItems;
+  final bool hasDrawer;
+  final VoidCallback? onDrawerToggle;
   final bool? showActions;
 
   @override
@@ -77,12 +79,11 @@ class _HeaderBarState extends State<HeaderBar> {
 
   @override
   Widget build(BuildContext context) {
+    final ScaffoldState? scaffold = Scaffold.maybeOf(context);
+    final bool hasDrawer = scaffold?.hasDrawer ?? widget.hasDrawer;
+
     final windowButtons = <String, Widget?>{
-      'menu': widget.menuItems.length > 0
-          ? PopupMenuButton(
-              itemBuilder: (_) => widget.menuItems,
-            )
-          : null,
+      'menu': hasDrawer ? DrawerButton(onPressed: widget.onDrawerToggle) : const BackButton(),
       'maximize': AdwWindowButton(
         nativeControls: true,
         buttonType: WindowButtonType.maximize,

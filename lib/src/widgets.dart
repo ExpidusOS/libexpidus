@@ -9,6 +9,7 @@ export 'widgets/app.dart';
 export 'widgets/button.dart';
 export 'widgets/headerbar.dart';
 export 'widgets/scaffold.dart';
+export 'widgets/sidebar.dart';
 export 'widgets/theme.dart';
 
 // Reexports
@@ -31,8 +32,6 @@ typedef Material = material.Material;
 typedef PopupMenu = adwaita.GtkPopupMenu;
 typedef PreferencesGroup = adwaita.AdwPreferencesGroup;
 typedef RefreshProgressIndicator = material.RefreshProgressIndicator;
-typedef Sidebar = adwaita.AdwSidebar;
-typedef SidebarItem = adwaita.AdwSidebarItem;
 typedef StackSidebar = adwaita.GtkStackSidebar;
 typedef Switch = adwaita.AdwSwitch;
 typedef SwitchRow = adwaita.AdwSwitchRow;

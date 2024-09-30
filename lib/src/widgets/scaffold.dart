@@ -19,7 +19,6 @@ class ExpidusScaffold extends StatefulWidget {
     this.viewSwitcherConstraint,
     this.start,
     this.end,
-    this.menuItems,
     this.showActions,
     this.backgroundImage,
     required this.body,
@@ -36,7 +35,6 @@ class ExpidusScaffold extends StatefulWidget {
   final double? viewSwitcherConstraint;
   final List<Widget>? start;
   final List<Widget>? end;
-  final List<PopupMenuEntry>? menuItems;
   final bool? showActions;
   final DecorationImage? backgroundImage;
   final Widget body;
@@ -95,8 +93,9 @@ class _ExpidusScaffoldState extends State<ExpidusScaffold> {
                           title),
               end: widget.end ?? [],
               start: widget.start ?? [],
-              menuItems: widget.menuItems ?? [],
               showActions: widget.showActions,
+              hasDrawer: isFlapVisible,
+              onDrawerToggle: () => _flapController!.toggle(),
             ),
             Expanded(
               child: Scaffold(
