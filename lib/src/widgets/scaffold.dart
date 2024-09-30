@@ -89,9 +89,10 @@ class _ExpidusScaffoldState extends State<ExpidusScaffold> {
               titleWidget: isViewSwitcherVisible && !isMobile
                   ? widget.viewSwitcher
                   : widget.titleWidget ??
-                      Text(onGenerateTitle != null
-                          ? onGenerateTitle!(context)
-                          : title),
+                      Text((onGenerateTitle != null
+                              ? onGenerateTitle!(context)
+                              : null) ??
+                          title),
               end: widget.end ?? [],
               start: widget.start ?? [],
               menuItems: widget.menuItems ?? [],

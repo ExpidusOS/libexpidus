@@ -157,11 +157,12 @@ class _HeaderBarState extends State<HeaderBar> {
                       ),
                       middle: widget.titleWidget ??
                           Text(
-                              onGenerateTitle != null
-                                  ? onGenerateTitle!(context)
-                                  : title,
-                              overflow: TextOverflow.fade,
-                              maxLines: 1,
+                            (onGenerateTitle != null
+                                    ? onGenerateTitle!(context)
+                                    : null) ??
+                                title,
+                            overflow: TextOverflow.fade,
+                            maxLines: 1,
                           ),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
