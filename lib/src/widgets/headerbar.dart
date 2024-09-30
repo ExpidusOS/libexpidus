@@ -104,7 +104,7 @@ class _HeaderBarState extends State<HeaderBar> {
 
     final onGenerateTitle =
         widget.onGenerateTitle ?? widgetsApp.onGenerateTitle;
-    final title = widget.title ?? widgetsApp.title;
+    final title = widget.title ?? widgetsApp.title ?? '';
 
     return Material(
       type: MaterialType.transparency,
