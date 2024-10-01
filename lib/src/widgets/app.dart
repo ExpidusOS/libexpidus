@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:adwaita/adwaita.dart';
 import 'package:flutter/foundation.dart'
-    show defaultTargetPlatform, TargetPlatform;
+    show defaultTargetPlatform, TargetPlatform, kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:libadwaita/libadwaita.dart';
