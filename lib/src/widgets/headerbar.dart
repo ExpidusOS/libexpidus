@@ -83,7 +83,9 @@ class _HeaderBarState extends State<HeaderBar> {
     final bool hasDrawer = scaffold?.hasDrawer ?? widget.hasDrawer;
 
     final windowButtons = <String, Widget?>{
-      'menu': hasDrawer ? DrawerButton(onPressed: widget.onDrawerToggle) : const BackButton(),
+      'menu': hasDrawer
+          ? DrawerButton(onPressed: widget.onDrawerToggle)
+          : const BackButton(),
       'maximize': AdwWindowButton(
         nativeControls: true,
         buttonType: WindowButtonType.maximize,

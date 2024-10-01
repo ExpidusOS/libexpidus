@@ -167,7 +167,8 @@ class _SidebarItemBuilder extends StatelessWidget {
     return Button.flat(
       constraints: const BoxConstraints.tightFor(height: 36),
       margin: const EdgeInsets.only(bottom: 2),
-      textStyle: Theme.of(context).textTheme.displayMedium ?? const TextStyle(fontWeight: FontWeight.normal),
+      textStyle: Theme.of(context).textTheme.displayMedium ??
+          const TextStyle(fontWeight: FontWeight.normal),
       padding: currentItem.padding,
       onPressed: () {
         onSelected?.call();
@@ -186,11 +187,13 @@ class _SidebarItemBuilder extends StatelessWidget {
               Text(
                 currentItem.label!,
                 style: (currentItem.labelStyle ??
-                    Theme.of(context).textTheme.labelLarge ?? const TextStyle(
-                      fontSize: 15,
-                    )).copyWith(
-                      color: Theme.of(context).colorScheme.onPrimary,
-                    ),
+                        Theme.of(context).textTheme.labelLarge ??
+                        const TextStyle(
+                          fontSize: 15,
+                        ))
+                    .copyWith(
+                  color: Theme.of(context).colorScheme.onPrimary,
+                ),
               ),
         ],
       ),

@@ -53,19 +53,21 @@ class _ExpidusAppState extends State<ExpidusApp> {
   void initState() {
     super.initState();
 
-    doWhenWindowReady(() {
-      appWindow!.title = widget.onGenerateTitle != null
-          ? widget.onGenerateTitle!(appKey.currentContext!)
-          : widget.title;
-      appWindow!.alignment = widget.windowAlignment;
-      appWindow!.minSize = widget.minWindowSize;
-      appWindow!.maxSize = widget.maxWindowSize;
-      appWindow!.show();
+    if (!kIsWeb && !Platform.isIOS && !Platform.isAndroid && !Platform.isFuchsia) {
+      doWhenWindowReady(() {
+        appWindow!.title = widget.onGenerateTitle != null
+            ? widget.onGenerateTitle!(appKey.currentContext!)
+            : widget.title;
+        appWindow!.alignment = widget.windowAlignment;
+        appWindow!.minSize = widget.minWindowSize;
+        appWindow!.maxSize = widget.maxWindowSize;
+        appWindow!.show();
 
-      if (widget.onWindowReady != null) {
-        widget.onWindowReady!();
-      }
-    });
+        if (widget.onWindowReady != null) {
+          widget.onWindowReady!();
+        }
+      });
+    }
   }
 
   @override
