@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:adwaita/adwaita.dart';
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, TargetPlatform;
