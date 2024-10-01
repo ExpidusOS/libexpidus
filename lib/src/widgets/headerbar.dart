@@ -69,6 +69,9 @@ class _HeaderBarState extends State<HeaderBar> {
 
       if (defaultTargetPlatform == TargetPlatform.macOS) {
         updateSep('close,minimize,maximize:menu');
+      } else if (defaultTargetPlatform == TargetPlatform.android ||
+          defaultTargetPlatform == TargetPlatform.iOS) {
+        updateSep('menu:');
       } else {
         _methodChannel.invokeMethod('getHeaderBarLayout').then((order) {
           updateSep(order);
@@ -86,21 +89,27 @@ class _HeaderBarState extends State<HeaderBar> {
       'menu': hasDrawer
           ? DrawerButton(onPressed: widget.onDrawerToggle)
           : const BackButton(),
-      'maximize': AdwWindowButton(
-        nativeControls: true,
-        buttonType: WindowButtonType.maximize,
-        onPressed: () => appWindow!.maximize(),
-      ),
-      'minimize': AdwWindowButton(
-        nativeControls: true,
-        buttonType: WindowButtonType.minimize,
-        onPressed: () => appWindow!.minimize(),
-      ),
-      'close': AdwWindowButton(
-        nativeControls: true,
-        buttonType: WindowButtonType.close,
-        onPressed: () => appWindow!.close(),
-      ),
+      'maximize': _showActions
+          ? AdwWindowButton(
+              nativeControls: true,
+              buttonType: WindowButtonType.maximize,
+              onPressed: () => appWindow!.maximize(),
+            )
+          : null,
+      'minimize': _showActions
+          ? AdwWindowButton(
+              nativeControls: true,
+              buttonType: WindowButtonType.minimize,
+              onPressed: () => appWindow!.minimize(),
+            )
+          : null,
+      'close': _showActions
+          ? AdwWindowButton(
+              nativeControls: true,
+              buttonType: WindowButtonType.close,
+              onPressed: () => appWindow!.close(),
+            )
+          : null,
     };
 
     final widgetsApp = context.findAncestorWidgetOfExactType<WidgetsApp>()!;
@@ -141,9 +150,7 @@ class _HeaderBarState extends State<HeaderBar> {
                       leading: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          if (_showActions &&
-                              sep != null &&
-                              sep[0].split(',').isNotEmpty) ...[
+                          if (sep != null && sep[0].split(',').isNotEmpty) ...[
                             SizedBox(width: 6),
                             for (var i in sep[0].split(','))
                               if (windowButtons[i] != null) windowButtons[i]!,
@@ -176,9 +183,7 @@ class _HeaderBarState extends State<HeaderBar> {
                               child: e,
                             ),
                           ),
-                          if (_showActions &&
-                              sep != null &&
-                              sep[1].split(',').isNotEmpty) ...[
+                          if (sep != null && sep[1].split(',').isNotEmpty) ...[
                             SizedBox(width: 6),
                             for (var i in sep[1].split(','))
                               if (windowButtons[i] != null) windowButtons[i]!,

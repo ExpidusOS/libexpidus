@@ -54,7 +54,10 @@ class _ExpidusAppState extends State<ExpidusApp> {
   void initState() {
     super.initState();
 
-    if (!kIsWeb && !Platform.isIOS && !Platform.isAndroid && !Platform.isFuchsia) {
+    if (!kIsWeb &&
+        !Platform.isIOS &&
+        !Platform.isAndroid &&
+        !Platform.isFuchsia) {
       doWhenWindowReady(() {
         appWindow!.title = widget.onGenerateTitle != null
             ? widget.onGenerateTitle!(appKey.currentContext!)
