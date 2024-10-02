@@ -44,7 +44,7 @@ class _HeaderBarState extends State<HeaderBar> {
       ? ValueNotifier(
           ['menu', 'minimize,maximize,close'],
         )
-      : ValueNotifier(null);
+      : ValueNotifier(['menu', '']);
 
   @override
   void initState() {
@@ -69,9 +69,6 @@ class _HeaderBarState extends State<HeaderBar> {
 
       if (defaultTargetPlatform == TargetPlatform.macOS) {
         updateSep('close,minimize,maximize:menu');
-      } else if (defaultTargetPlatform == TargetPlatform.android ||
-          defaultTargetPlatform == TargetPlatform.iOS) {
-        updateSep('menu:');
       } else {
         _methodChannel.invokeMethod('getHeaderBarLayout').then((order) {
           updateSep(order);

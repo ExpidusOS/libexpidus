@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, TargetPlatform;
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:libadwaita/libadwaita.dart';
 import 'package:libadwaita_bitsdojo/libadwaita_bitsdojo.dart';
 import 'headerbar.dart';
@@ -50,13 +51,21 @@ class _ExpidusScaffoldState extends State<ExpidusScaffold> {
   void initState() {
     super.initState();
     _flapController = widget.flapController ?? FlapController();
+
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      final isMobile = MediaQuery.sizeOf(context).width <=
+          (widget.viewSwitcherConstraint ?? 600);
+      if (isMobile && _flapController!.isOpen) {
+        _flapController!.close();
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final widgetsApp = context.findAncestorWidgetOfExactType<WidgetsApp>()!;
 
-    final isMobile = MediaQuery.of(context).size.width <=
+    final isMobile = MediaQuery.sizeOf(context).width <=
         (widget.viewSwitcherConstraint ?? 600);
     final isFlapVisible = widget.flap != null;
     final isViewSwitcherVisible = widget.viewSwitcher != null;
