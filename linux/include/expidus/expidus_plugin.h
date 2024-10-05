@@ -21,6 +21,8 @@ FLUTTER_PLUGIN_EXPORT GType expidus_plugin_get_type();
 FLUTTER_PLUGIN_EXPORT void expidus_plugin_register_with_registrar(
     FlPluginRegistrar* registrar);
 
+FLUTTER_PLUGIN_EXPORT void expidus_plugin_set_window(ExpidusPlugin* self, GtkWindow* window);
+
 G_END_DECLS
 
 #endif  // FLUTTER_PLUGIN_EXPIDUS_PLUGIN_H_

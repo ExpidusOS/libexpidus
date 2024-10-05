@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.10)
 
 # Project-level configuration.
 set(PROJECT_NAME "expidus")
-project(${PROJECT_NAME} LANGUAGES CXX)
+project(${PROJECT_NAME} LANGUAGES CXX C)
 
 # This value is used when generating builds using this plugin, so it must
 # not be changed.
@@ -15,6 +15,8 @@ set(LIB_NAME "expidus")
 # Any new source files that you add to the plugin should be added here.
 list(APPEND PLUGIN_SOURCES
   "expidus_plugin.cc"
+  "plugin/monitor.c"
+  "plugin/wayland.c"
 )
 
 list(APPEND LIB_SOURCES
@@ -47,16 +49,25 @@ target_compile_definitions(${PLUGIN_NAME} PRIVATE FLUTTER_PLUGIN_IMPL)
 # dependencies here.
 include_directories(include "${FLUTTER_MANAGED_DIR}/..")
 
+pkg_check_modules(GTK_LAYER_SHELL IMPORTED_TARGET gtk-layer-shell-0)
+pkg_check_modules(GTK_WAYLAND REQUIRED IMPORTED_TARGET gtk+-wayland-3.0 wayland-client)
+
 target_include_directories(${PLUGIN_NAME} INTERFACE
   "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_link_libraries(${PLUGIN_NAME} PRIVATE flutter)
 target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::GTK)
+target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::GTK_WAYLAND)
 
 target_include_directories(${LIB_NAME} INTERFACE
   "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_link_libraries(${LIB_NAME} PRIVATE flutter)
 target_link_libraries(${LIB_NAME} PRIVATE PkgConfig::GTK)
 target_link_libraries(${LIB_NAME} PRIVATE bitsdojo_window_linux_plugin)
+
+if(${GTK_LAYER_SHELL_FOUND})
+  target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::GTK_LAYER_SHELL)
+  target_compile_definitions(${PLUGIN_NAME} PRIVATE GTK_LAYER_SHELL_FOUND)
+endif()
 
 # List of absolute paths to libraries that should be bundled with the plugin.
 # This list could contain prebuilt libraries, or libraries created by an
@@ -101,6 +112,7 @@ apply_standard_settings(${TEST_RUNNER})
 target_include_directories(${TEST_RUNNER} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(${TEST_RUNNER} PRIVATE flutter)
 target_link_libraries(${TEST_RUNNER} PRIVATE PkgConfig::GTK)
+target_link_libraries(${TEST_RUNNER} PRIVATE PkgConfig::GTK_WAYLAND)
 target_link_libraries(${TEST_RUNNER} PRIVATE gtest_main gmock)
 
 # Enable automatic test discovery.

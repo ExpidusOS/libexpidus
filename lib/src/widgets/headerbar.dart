@@ -4,6 +4,7 @@ import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:libadwaita/libadwaita.dart';
+import 'app.dart';
 
 class HeaderBar extends StatefulWidget {
   const HeaderBar({
@@ -32,25 +33,24 @@ class HeaderBar extends StatefulWidget {
 }
 
 class _HeaderBarState extends State<HeaderBar> {
-  static final _methodChannel = MethodChannel('expidus');
-
-  bool get _showActions =>
-      widget.showActions ??
-      (defaultTargetPlatform == TargetPlatform.linux ||
-          defaultTargetPlatform == TargetPlatform.macOS ||
-          defaultTargetPlatform == TargetPlatform.windows);
-
-  late ValueNotifier<List<String>?> separator = _showActions
+  late ValueNotifier<List<String>?> separator = _showActions(context)
       ? ValueNotifier(
           ['menu', 'minimize,maximize,close'],
         )
       : ValueNotifier(['menu', '']);
 
+  bool _showActions(BuildContext context) =>
+      widget.showActions ??
+      (defaultTargetPlatform == TargetPlatform.linux ||
+              defaultTargetPlatform == TargetPlatform.macOS ||
+              defaultTargetPlatform == TargetPlatform.windows) &&
+          !ExpidusApp.hasWindowLayer(context);
+
   @override
   void initState() {
     super.initState();
 
-    if (_showActions) {
+    if (_showActions(context)) {
       void updateSep(String order) {
         if (!mounted) return;
         separator.value = order.split(':')
@@ -70,7 +70,10 @@ class _HeaderBarState extends State<HeaderBar> {
       if (defaultTargetPlatform == TargetPlatform.macOS) {
         updateSep('close,minimize,maximize:menu');
       } else {
-        _methodChannel.invokeMethod('getHeaderBarLayout').then((order) {
+        ExpidusApp.of(context)
+            .methodChannel
+            .invokeMethod('getHeaderBarLayout')
+            .then((order) {
           updateSep(order);
         });
       }
@@ -78,131 +81,142 @@ class _HeaderBarState extends State<HeaderBar> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final ScaffoldState? scaffold = Scaffold.maybeOf(context);
-    final bool hasDrawer = scaffold?.hasDrawer ?? widget.hasDrawer;
+  Widget build(BuildContext context) => ValueListenableBuilder(
+        valueListenable: ExpidusApp.of(context).hasWindowLayer,
+        builder: (context, _hasWindowLayer, _) {
+          final ScaffoldState? scaffold = Scaffold.maybeOf(context);
+          final bool hasDrawer = scaffold?.hasDrawer ?? widget.hasDrawer;
 
-    final ModalRoute<dynamic>? parentRoute = ModalRoute.of(context);
-    final bool useCloseButton =
-        parentRoute is PageRoute<dynamic> && parentRoute.fullscreenDialog;
+          final ModalRoute<dynamic>? parentRoute = ModalRoute.of(context);
+          final bool useCloseButton =
+              parentRoute is PageRoute<dynamic> && parentRoute.fullscreenDialog;
 
-    final windowButtons = <String, Widget?>{
-      'menu': hasDrawer
-          ? DrawerButton(onPressed: widget.onDrawerToggle)
-          : (parentRoute?.impliesAppBarDismissal ?? false && !useCloseButton
-              ? const BackButton()
-              : null),
-      'maximize': _showActions
-          ? AdwWindowButton(
-              nativeControls: true,
-              buttonType: WindowButtonType.maximize,
-              onPressed: () => appWindow!.maximize(),
-            )
-          : null,
-      'minimize': _showActions
-          ? AdwWindowButton(
-              nativeControls: true,
-              buttonType: WindowButtonType.minimize,
-              onPressed: () => appWindow!.minimize(),
-            )
-          : null,
-      'close': _showActions
-          ? AdwWindowButton(
-              nativeControls: true,
-              buttonType: WindowButtonType.close,
-              onPressed: () => appWindow!.close(),
-            )
-          : null,
-    };
+          final windowButtons = <String, Widget?>{
+            'menu': hasDrawer
+                ? DrawerButton(onPressed: widget.onDrawerToggle)
+                : (parentRoute?.impliesAppBarDismissal ??
+                        false && !useCloseButton
+                    ? const BackButton()
+                    : null),
+            'maximize': _showActions(context)
+                ? AdwWindowButton(
+                    nativeControls: true,
+                    buttonType: WindowButtonType.maximize,
+                    onPressed: () => appWindow!.maximize(),
+                  )
+                : null,
+            'minimize': _showActions(context)
+                ? AdwWindowButton(
+                    nativeControls: true,
+                    buttonType: WindowButtonType.minimize,
+                    onPressed: () => appWindow!.minimize(),
+                  )
+                : null,
+            'close': _showActions(context)
+                ? AdwWindowButton(
+                    nativeControls: true,
+                    buttonType: WindowButtonType.close,
+                    onPressed: () => appWindow!.close(),
+                  )
+                : null,
+          };
 
-    final widgetsApp = context.findAncestorWidgetOfExactType<WidgetsApp>()!;
+          final widgetsApp =
+              context.findAncestorWidgetOfExactType<WidgetsApp>()!;
 
-    final onGenerateTitle =
-        widget.onGenerateTitle ?? widgetsApp.onGenerateTitle;
-    final title = widget.title ?? widgetsApp.title ?? '';
+          final onGenerateTitle =
+              widget.onGenerateTitle ?? widgetsApp.onGenerateTitle;
+          final title = widget.title ?? widgetsApp.title ?? '';
 
-    return Material(
-      type: MaterialType.transparency,
-      elevation: Theme.of(context).appBarTheme.elevation ?? 3.0,
-      shadowColor: Theme.of(context).appBarTheme.shadowColor,
-      child: GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        onPanStart: (_) => appWindow!.startDragging(),
-        child: Align(
-          alignment: Alignment.topCenter,
-          child: Container(
-            decoration: ShapeDecoration(
-              color: Theme.of(context).appBarTheme.backgroundColor,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            height: 50,
-            width: double.infinity,
-            child: Stack(
-              children: [
-                ValueListenableBuilder<List<String>?>(
-                  valueListenable: separator,
-                  builder: (context, sep, _) => DefaultTextStyle.merge(
-                    style: Theme.of(context).textTheme.titleLarge ??
-                        const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                    child: NavigationToolbar(
-                      leading: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          if (sep != null && sep[0].split(',').isNotEmpty) ...[
-                            SizedBox(width: 6),
-                            for (var i in sep[0].split(','))
-                              if (windowButtons[i] != null) windowButtons[i]!,
-                            if (defaultTargetPlatform == TargetPlatform.linux)
-                              SizedBox(width: 6),
-                          ],
-                          ...widget.start.map(
-                            (e) => Padding(
-                              padding: const EdgeInsets.only(right: 4),
-                              child: e,
-                            ),
-                          ),
-                        ],
-                      ),
-                      middle: widget.titleWidget ??
-                          Text(
-                            (onGenerateTitle != null
-                                    ? onGenerateTitle!(context)
-                                    : null) ??
-                                title,
-                            overflow: TextOverflow.fade,
-                            maxLines: 1,
-                          ),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          ...widget.end.map(
-                            (e) => Padding(
-                              padding: const EdgeInsets.only(left: 4),
-                              child: e,
-                            ),
-                          ),
-                          if (sep != null && sep[1].split(',').isNotEmpty) ...[
-                            SizedBox(width: 6),
-                            for (var i in sep[1].split(','))
-                              if (windowButtons[i] != null) windowButtons[i]!,
-                            if (defaultTargetPlatform == TargetPlatform.linux)
-                              SizedBox(width: 6),
-                          ],
-                        ],
-                      ),
+          return Material(
+            type: MaterialType.transparency,
+            elevation: Theme.of(context).appBarTheme.elevation ?? 3.0,
+            shadowColor: Theme.of(context).appBarTheme.shadowColor,
+            child: GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onPanStart: (_) => appWindow!.startDragging(),
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: Container(
+                  decoration: ShapeDecoration(
+                    color: Theme.of(context).appBarTheme.backgroundColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
                     ),
                   ),
+                  height: 50,
+                  width: double.infinity,
+                  child: Stack(
+                    children: [
+                      ValueListenableBuilder<List<String>?>(
+                        valueListenable: separator,
+                        builder: (context, sep, _) => DefaultTextStyle.merge(
+                          style: Theme.of(context).textTheme.titleLarge ??
+                              const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                          child: NavigationToolbar(
+                            leading: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (sep != null &&
+                                    sep[0].split(',').isNotEmpty) ...[
+                                  SizedBox(width: 6),
+                                  for (var i in sep[0].split(','))
+                                    if (windowButtons[i] != null)
+                                      windowButtons[i]!,
+                                  if (defaultTargetPlatform ==
+                                      TargetPlatform.linux)
+                                    SizedBox(width: 6),
+                                ],
+                                ...widget.start.map(
+                                  (e) => Padding(
+                                    padding: const EdgeInsets.only(right: 4),
+                                    child: e,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            middle: widget.titleWidget ??
+                                Text(
+                                  (onGenerateTitle != null
+                                          ? onGenerateTitle!(context)
+                                          : null) ??
+                                      title,
+                                  overflow: TextOverflow.fade,
+                                  maxLines: 1,
+                                ),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                ...widget.end.map(
+                                  (e) => Padding(
+                                    padding: const EdgeInsets.only(left: 4),
+                                    child: e,
+                                  ),
+                                ),
+                                if (sep != null &&
+                                    sep[1].split(',').isNotEmpty) ...[
+                                  SizedBox(width: 6),
+                                  for (var i in sep[1].split(','))
+                                    if (windowButtons[i] != null)
+                                      windowButtons[i]!,
+                                  if (defaultTargetPlatform ==
+                                      TargetPlatform.linux)
+                                    SizedBox(width: 6),
+                                ],
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ],
+              ),
             ),
-          ),
-        ),
-      ),
-    );
-  }
+          );
+        },
+      );
 }

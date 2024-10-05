@@ -17,6 +17,9 @@
             flutter
             pkg-config
             gtk3
+            gtk-layer-shell
+            yq
+            gdb
           ];
         };
       });

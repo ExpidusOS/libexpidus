@@ -6,5 +6,14 @@
 // https://github.com/flutter/flutter/issues/88724 for current limitations
 // in the unit-testable API.
 
-// Handles the getPlatformVersion method call.
-FlMethodResponse *get_platform_version();
+struct _ExpidusPlugin {
+  GObject parent_instance;
+  gboolean has_layer;
+  GtkWindow* window;
+  GList* monitors;
+  FlPluginRegistrar* registrar;
+};
+
+#define EXPIDUS_PLUGIN(obj) \
+  (G_TYPE_CHECK_INSTANCE_CAST((obj), expidus_plugin_get_type(), \
+                              ExpidusPlugin))

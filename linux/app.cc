@@ -4,6 +4,8 @@
 
 #include "flutter/generated_plugin_registrant.h"
 
+#include "expidus_plugin_private.h"
+
 struct _ExpidusApplication {
   GtkApplication parent_instance;
   char** dart_entrypoint_arguments;
@@ -29,6 +31,9 @@ static void expidus_application_activate(GApplication* application) {
   gtk_container_add(GTK_CONTAINER(window), GTK_WIDGET(view));
 
   fl_register_plugins(FL_PLUGIN_REGISTRY(view));
+
+  ExpidusPlugin* plugin = EXPIDUS_PLUGIN(g_object_get_data(G_OBJECT(view), "ExpidusPlugin"));
+  expidus_plugin_set_window(plugin, window);
 
   GdkRGBA accentColor;
 	GtkStyleContext *context = gtk_widget_get_style_context(GTK_WIDGET(view));

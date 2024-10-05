@@ -20,6 +20,7 @@ class ExpidusScaffold extends StatefulWidget {
     this.viewSwitcherConstraint,
     this.start,
     this.end,
+    this.showHeaderBar,
     this.showActions,
     this.backgroundImage,
     required this.body,
@@ -36,6 +37,7 @@ class ExpidusScaffold extends StatefulWidget {
   final double? viewSwitcherConstraint;
   final List<Widget>? start;
   final List<Widget>? end;
+  final bool? showHeaderBar;
   final bool? showActions;
   final DecorationImage? backgroundImage;
   final Widget body;
@@ -92,20 +94,21 @@ class _ExpidusScaffoldState extends State<ExpidusScaffold> {
         ),
         child: Column(
           children: [
-            HeaderBar(
-              titleWidget: isViewSwitcherVisible && !isMobile
-                  ? widget.viewSwitcher
-                  : widget.titleWidget ??
-                      Text((onGenerateTitle != null
-                              ? onGenerateTitle!(context)
-                              : null) ??
-                          title),
-              end: widget.end ?? [],
-              start: widget.start ?? [],
-              showActions: widget.showActions,
-              hasDrawer: isFlapVisible,
-              onDrawerToggle: () => _flapController!.toggle(),
-            ),
+            if (widget.showHeaderBar ?? true)
+              HeaderBar(
+                titleWidget: isViewSwitcherVisible && !isMobile
+                    ? widget.viewSwitcher
+                    : widget.titleWidget ??
+                        Text((onGenerateTitle != null
+                                ? onGenerateTitle!(context)
+                                : null) ??
+                            title),
+                end: widget.end ?? [],
+                start: widget.start ?? [],
+                showActions: widget.showActions,
+                hasDrawer: isFlapVisible,
+                onDrawerToggle: () => _flapController!.toggle(),
+              ),
             Expanded(
               child: Scaffold(
                 key: widget.scaffoldKey,
