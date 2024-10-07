@@ -8,10 +8,22 @@
 
 struct _ExpidusApplication {
   GtkApplication parent_instance;
+  gboolean supports_alpha;
   char** dart_entrypoint_arguments;
 };
 
 G_DEFINE_TYPE(ExpidusApplication, expidus_application, GTK_TYPE_APPLICATION)
+
+static gboolean draw(GtkWidget* widget, cairo_t* cr, gpointer userdata) {
+  ExpidusApplication* app = EXPIDUS_APPLICATION(userdata);
+
+  if (app->supports_alpha) cairo_set_source_rgba(cr, 0.0, 0.0, 0.0, 1.0);
+  else cairo_set_source_rgb(cr, 1.0, 1.0, 1.0);
+
+  cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
+  cairo_paint(cr);
+  return false;
+}
 
 // Implements GApplication::activate.
 static void expidus_application_activate(GApplication* application) {
@@ -21,7 +33,6 @@ static void expidus_application_activate(GApplication* application) {
 
   auto bdw = bitsdojo_window_from(window);
   bdw->setCustomFrame(true);
-  gtk_widget_show(GTK_WIDGET(window));
 
   g_autoptr(FlDartProject) project = fl_dart_project_new();
   fl_dart_project_set_dart_entrypoint_arguments(project, self->dart_entrypoint_arguments);
@@ -35,10 +46,23 @@ static void expidus_application_activate(GApplication* application) {
   ExpidusPlugin* plugin = EXPIDUS_PLUGIN(g_object_get_data(G_OBJECT(view), "ExpidusPlugin"));
   expidus_plugin_set_window(plugin, window);
 
-  GdkRGBA accentColor;
-	GtkStyleContext *context = gtk_widget_get_style_context(GTK_WIDGET(view));
-	gtk_style_context_lookup_color(context, "theme_selected_fg_color", &accentColor);
+  gtk_widget_set_app_paintable(GTK_WIDGET(window), true);
+  g_signal_connect(G_OBJECT(window), "draw", G_CALLBACK(draw), self);
 
+  GdkScreen* screen = gtk_widget_get_screen(GTK_WIDGET(window));
+  GdkVisual* visual = gdk_screen_get_rgba_visual(screen);
+
+  if (visual == nullptr) {
+    visual = gdk_screen_get_system_visual(screen);
+    self->supports_alpha = false;
+  } else {
+    self->supports_alpha = true;
+  }
+
+  gtk_widget_set_visual(GTK_WIDGET(window), visual);
+  gtk_widget_set_visual(GTK_WIDGET(view), visual);
+
+  gtk_widget_map(GTK_WIDGET(view));
   gtk_widget_grab_focus(GTK_WIDGET(view));
 }
 

@@ -1,78 +1,13 @@
 import 'dart:io';
-import 'dart:convert' show json;
 import 'package:adwaita/adwaita.dart';
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, TargetPlatform, kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:libadwaita/libadwaita.dart';
 import 'package:libadwaita_bitsdojo/libadwaita_bitsdojo.dart';
+import '../logic/method_channel.dart';
 import 'theme.dart';
 import 'scaffold.dart';
-
-enum ExpidusWindowLayer {
-  background,
-  bottom,
-  top,
-  overlay,
-}
-
-enum ExpidusWindowLayerKeyboardMode {
-  none,
-  exclusive,
-  demand,
-}
-
-class ExpidusWindowLayerAnchor {
-  const ExpidusWindowLayerAnchor({
-    this.toEdge = false,
-    this.margin = 0,
-  });
-
-  final bool toEdge;
-  final int margin;
-
-  dynamic toJSON() => {
-        'toEdge': toEdge,
-        'margin': margin,
-      };
-
-  @override
-  String toString() => json.encode(toJSON());
-}
-
-class ExpidusWindowLayerConfig {
-  const ExpidusWindowLayerConfig({
-    this.layer = ExpidusWindowLayer.top,
-    this.monitor,
-    this.keyboardMode = ExpidusWindowLayerKeyboardMode.none,
-    this.top = const ExpidusWindowLayerAnchor(),
-    this.bottom = const ExpidusWindowLayerAnchor(),
-    this.left = const ExpidusWindowLayerAnchor(),
-    this.right = const ExpidusWindowLayerAnchor(),
-  });
-
-  final ExpidusWindowLayer layer;
-  final String? monitor;
-  final ExpidusWindowLayerKeyboardMode keyboardMode;
-  final ExpidusWindowLayerAnchor top;
-  final ExpidusWindowLayerAnchor bottom;
-  final ExpidusWindowLayerAnchor left;
-  final ExpidusWindowLayerAnchor right;
-
-  dynamic toJSON() => {
-        'layer': layer.name,
-        'monitor': monitor,
-        'keyboardMode': keyboardMode.name,
-        'top': top.toJSON(),
-        'bottom': bottom.toJSON(),
-        'left': left.toJSON(),
-        'right': right.toJSON(),
-      };
-
-  @override
-  String toString() => json.encode(toJSON());
-}
 
 class ExpidusApp extends StatefulWidget {
   const ExpidusApp({
@@ -92,7 +27,6 @@ class ExpidusApp extends StatefulWidget {
     this.maxWindowSize,
     this.windowSize,
     this.onWindowReady,
-    this.windowLayer,
   });
 
   final String title;
@@ -110,7 +44,6 @@ class ExpidusApp extends StatefulWidget {
   final Size? maxWindowSize;
   final Size? windowSize;
   final VoidCallback? onWindowReady;
-  final ExpidusWindowLayerConfig? windowLayer;
 
   @override
   State<ExpidusApp> createState() => ExpidusAppState();
@@ -131,7 +64,6 @@ class ExpidusApp extends StatefulWidget {
 }
 
 class ExpidusAppState extends State<ExpidusApp> {
-  final methodChannel = MethodChannel('expidus');
   final _appKey = GlobalKey<State<MaterialApp>>();
 
   ValueNotifier<bool> _hasWindowLayer = ValueNotifier(false);
@@ -140,6 +72,10 @@ class ExpidusAppState extends State<ExpidusApp> {
   @override
   void initState() {
     super.initState();
+
+    final methodChannel = ExpidusMethodChannel.ensureInitialized();
+    _hasWindowLayer.value = methodChannel.hasWindowLayer;
+    _hasWindowLayer.notifyListeners();
 
     if (!kIsWeb &&
         !Platform.isIOS &&
@@ -155,21 +91,6 @@ class ExpidusAppState extends State<ExpidusApp> {
 
         if (widget.windowSize != null) {
           appWindow!.size = widget.windowSize!;
-        }
-
-        if (widget.windowLayer != null && Platform.isLinux) {
-          methodChannel.invokeMethod('setLayering', {
-            ...(widget.windowLayer!.toJSON() as Map<String, dynamic>),
-            'width': appWindow!.size.width,
-            'height': appWindow!.size.height,
-          }).then((_) {
-            setState(() {
-              _hasWindowLayer.value = true;
-              _hasWindowLayer.notifyListeners();
-            });
-          });
-        } else {
-          appWindow!.show();
         }
 
         if (widget.onWindowReady != null) {

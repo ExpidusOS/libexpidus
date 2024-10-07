@@ -2,8 +2,9 @@ import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, TargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:libadwaita/libadwaita.dart';
+import 'package:libadwaita/libadwaita.dart' hide FlapOptions;
 import 'package:libadwaita_bitsdojo/libadwaita_bitsdojo.dart';
+import 'flap.dart';
 import 'headerbar.dart';
 
 class ExpidusScaffold extends StatefulWidget {
@@ -20,10 +21,12 @@ class ExpidusScaffold extends StatefulWidget {
     this.viewSwitcherConstraint,
     this.start,
     this.end,
+    this.headerBarPadding,
     this.showHeaderBar,
     this.showActions,
     this.backgroundImage,
-    required this.body,
+    this.transparentBody,
+    this.body,
   });
 
   final Key? scaffoldKey;
@@ -37,10 +40,12 @@ class ExpidusScaffold extends StatefulWidget {
   final double? viewSwitcherConstraint;
   final List<Widget>? start;
   final List<Widget>? end;
+  final EdgeInsetsGeometry? headerBarPadding;
   final bool? showHeaderBar;
   final bool? showActions;
   final DecorationImage? backgroundImage;
-  final Widget body;
+  final bool? transparentBody;
+  final Widget? body;
 
   @override
   State<ExpidusScaffold> createState() => _ExpidusScaffoldState();
@@ -58,7 +63,9 @@ class _ExpidusScaffoldState extends State<ExpidusScaffold> {
       final isMobile = MediaQuery.sizeOf(context).width <=
           (widget.viewSwitcherConstraint ?? 600);
       if (isMobile && _flapController!.isOpen) {
-        _flapController!.close();
+        if (_flapController!.context != null) {
+          _flapController!.close();
+        }
       }
     });
   }
@@ -89,25 +96,31 @@ class _ExpidusScaffoldState extends State<ExpidusScaffold> {
     return SafeArea(
       child: Container(
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
+          backgroundBlendMode: BlendMode.src,
+          color: (widget.transparentBody ?? false)
+              ? Colors.transparent
+              : Theme.of(context).colorScheme.surface,
           image: widget.backgroundImage,
         ),
         child: Column(
           children: [
             if (widget.showHeaderBar ?? true)
-              HeaderBar(
-                titleWidget: isViewSwitcherVisible && !isMobile
-                    ? widget.viewSwitcher
-                    : widget.titleWidget ??
-                        Text((onGenerateTitle != null
-                                ? onGenerateTitle!(context)
-                                : null) ??
-                            title),
-                end: widget.end ?? [],
-                start: widget.start ?? [],
-                showActions: widget.showActions,
-                hasDrawer: isFlapVisible,
-                onDrawerToggle: () => _flapController!.toggle(),
+              Padding(
+                padding: widget.headerBarPadding ?? EdgeInsets.zero,
+                child: HeaderBar(
+                  titleWidget: (isViewSwitcherVisible && !isMobile
+                          ? widget.viewSwitcher
+                          : widget.titleWidget) ??
+                      Text((onGenerateTitle != null
+                              ? onGenerateTitle!(context)
+                              : null) ??
+                          title),
+                  end: widget.end ?? [],
+                  start: widget.start ?? [],
+                  showActions: widget.showActions,
+                  hasDrawer: isFlapVisible,
+                  onDrawerToggle: () => _flapController!.toggle(),
+                ),
               ),
             Expanded(
               child: Scaffold(
@@ -119,10 +132,11 @@ class _ExpidusScaffoldState extends State<ExpidusScaffold> {
                         ?.shouldEnableDrawerGesture(FlapPosition.end) ??
                     false,
                 onDrawerChanged: _flapController?.onDrawerChanged,
+                backgroundColor: Colors.transparent,
                 drawer: flap,
                 endDrawer: flap,
                 body: isFlapVisible
-                    ? AdwFlap(
+                    ? Flap(
                         flap: widget.flap!(false),
                         controller: widget.flapController,
                         options: widget.flapOptions,
@@ -148,7 +162,7 @@ class _ExpidusScaffoldState extends State<ExpidusScaffold> {
                       )
                     : null,
               ),
-            )
+            ),
           ],
         ),
       ),

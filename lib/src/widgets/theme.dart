@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:libadwaita/libadwaita.dart';
 import 'package:libadwaita_bitsdojo/libadwaita_bitsdojo.dart';
-import 'app.dart';
+import '../logic/method_channel.dart';
 
 class ExpidusThemeManager extends StatefulWidget {
   const ExpidusThemeManager({
@@ -57,9 +57,7 @@ class ExpidusThemeManagerState extends State<ExpidusThemeManager> {
       Color.fromARGB(values['A']!, values['R']!, values['G']!, values['B']!);
 
   Future<ThemeData> getSystemTheme(Brightness brightness) async {
-    final data = await ExpidusApp.of(context)
-        .methodChannel
-        .invokeMethod('getSystemTheme', brightness == Brightness.dark);
+    final data = await ExpidusMethodChannel.instance.getSystemTheme(brightness);
 
     final colorScheme = ColorScheme(
       primary: _fromMap(data['colorScheme']['primary'].cast<String, int>()),

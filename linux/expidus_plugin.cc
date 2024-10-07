@@ -126,9 +126,6 @@ static void expidus_plugin_handle_method_call(
 #ifdef GTK_LAYER_SHELL_FOUND
   } else if (strcmp(method, "setLayering") == 0) {
     if (gtk_layer_is_supported()) {
-      gboolean was_mapped = gtk_widget_get_mapped(GTK_WIDGET(self->window));
-      gtk_widget_set_visible(GTK_WIDGET(self->window), false);
-
       FlValue* args = fl_method_call_get_args(method_call);
 
       gint width = 0;
@@ -144,9 +141,11 @@ static void expidus_plugin_handle_method_call(
         height = fl_value_get_int(arg_height);
       }
 
-      if (was_mapped && width == 0 && height == 0) {
-        gtk_window_get_size(self->window, &width, &height);
-      }
+      gint temp_width, temp_height;
+      gtk_window_get_size(self->window, &temp_width, &temp_height);
+
+      if (height == 0) temp_height = height;
+      if (width == 0) temp_width = width;
 
       if (!self->has_layer) {
         gtk_layer_init_for_window(self->window);
@@ -154,11 +153,11 @@ static void expidus_plugin_handle_method_call(
       }
 
       FlValue* arg_monitor = fl_value_lookup_string(args, "monitor");
+      GdkDisplay* display = gtk_widget_get_display(GTK_WIDGET(self->window));
+      GdkMonitor* found_monitor = nullptr;
+
       if (fl_value_get_type(arg_monitor) == FL_VALUE_TYPE_STRING) {
         const gchar* monitor_name = fl_value_get_string(arg_monitor);
-
-        GdkDisplay* display = gtk_widget_get_display(GTK_WIDGET(self->window));
-        GdkMonitor* found_monitor = nullptr;
 
         int n_monitors = gdk_display_get_n_monitors(display);
         for (int i = 0; i < n_monitors; i++) {
@@ -183,6 +182,40 @@ static void expidus_plugin_handle_method_call(
             break;
           }
         }
+      } else {
+        found_monitor = gdk_display_get_monitor_at_window(display, gtk_widget_get_window(GTK_WIDGET(self->window)));
+      }
+
+      if (found_monitor != nullptr) {
+        GdkRectangle geom;
+        gdk_monitor_get_geometry(found_monitor, &geom);
+
+        if (fl_value_get_bool(fl_value_lookup_string(fl_value_lookup_string(args, "top"), "toEdge")) && fl_value_get_bool(fl_value_lookup_string(fl_value_lookup_string(args, "bottom"), "toEdge"))) {
+          height = geom.height - (fl_value_get_int(fl_value_lookup_string(fl_value_lookup_string(args, "top"), "margin")) + fl_value_get_int(fl_value_lookup_string(fl_value_lookup_string(args, "bottom"), "margin")));
+        } else if (height == 0) {
+          height = geom.height;
+        }
+
+        if (fl_value_get_bool(fl_value_lookup_string(fl_value_lookup_string(args, "left"), "toEdge")) && fl_value_get_bool(fl_value_lookup_string(fl_value_lookup_string(args, "right"), "toEdge"))) {
+          width = geom.width - (fl_value_get_int(fl_value_lookup_string(fl_value_lookup_string(args, "left"), "margin")) + fl_value_get_int(fl_value_lookup_string(fl_value_lookup_string(args, "right"), "margin")));
+        } else if (width == 0) {
+          width = geom.height;
+        }
+      }
+
+      gboolean auto_exclusive_zone = fl_value_get_bool(fl_value_lookup_string(args, "autoExclusiveZone"));
+
+      if (auto_exclusive_zone) {
+        gtk_layer_auto_exclusive_zone_enable(self->window);
+      } else {
+        gtk_layer_set_exclusive_zone(self->window, 0);
+      }
+
+      gboolean fixed_size = fl_value_get_bool(fl_value_lookup_string(args, "fixedSize"));
+
+      if (!fixed_size) {
+        width = -1;
+        height = -1;
       }
 
       const gchar* layer_name = fl_value_get_string(fl_value_lookup_string(args, "layer"));
@@ -212,13 +245,14 @@ static void expidus_plugin_handle_method_call(
       set_layer_anchor(self->window, fl_value_lookup_string(args, "left"), GTK_LAYER_SHELL_EDGE_LEFT);
       set_layer_anchor(self->window, fl_value_lookup_string(args, "right"), GTK_LAYER_SHELL_EDGE_RIGHT);
 
-      gtk_widget_set_visible(GTK_WIDGET(self->window), was_mapped);
-      if (was_mapped) {
-        gtk_widget_set_size_request(GTK_WIDGET(self->window), width, height);
-        gtk_window_resize(self->window, 1, 1);
-      }
+      gtk_widget_set_size_request(GTK_WIDGET(self->window), width, height);
+      gtk_widget_show_all(GTK_WIDGET(self->window));
 
-      response = FL_METHOD_RESPONSE(fl_method_success_response_new(nullptr));
+      FlValue* value = fl_value_new_map();
+      fl_value_set_string_take(value, "width", fl_value_new_int(width));
+      fl_value_set_string_take(value, "height", fl_value_new_int(height));
+
+      response = FL_METHOD_RESPONSE(fl_method_success_response_new(value));
     } else {
       response = FL_METHOD_RESPONSE(fl_method_not_implemented_response_new());
     }

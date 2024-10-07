@@ -2,8 +2,8 @@ import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, TargetPlatform;
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:libadwaita/libadwaita.dart';
+import '../logic/method_channel.dart';
 import 'app.dart';
 
 class HeaderBar extends StatefulWidget {
@@ -70,10 +70,7 @@ class _HeaderBarState extends State<HeaderBar> {
       if (defaultTargetPlatform == TargetPlatform.macOS) {
         updateSep('close,minimize,maximize:menu');
       } else {
-        ExpidusApp.of(context)
-            .methodChannel
-            .invokeMethod('getHeaderBarLayout')
-            .then((order) {
+        ExpidusMethodChannel.instance.getHeaderBarLayout().then((order) {
           updateSep(order);
         });
       }

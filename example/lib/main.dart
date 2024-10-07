@@ -1,7 +1,7 @@
 import 'package:expidus/expidus.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const ExpidusAppConfig(const MyApp()));
 }
 
 class MyApp extends StatefulWidget {

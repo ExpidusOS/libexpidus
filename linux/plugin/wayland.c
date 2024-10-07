@@ -16,8 +16,6 @@ static void wl_output_geometry(void* data, struct wl_output* wl_output, int32_t 
 
   monitor->x = x;
   monitor->y = y;
-
-  g_message("%s - %s", make, model);
 }
 
 static void wl_output_mode(void* data, struct wl_output* wl_output, uint32_t flags, int32_t width, int32_t height, int32_t refresh) {
@@ -34,7 +32,6 @@ static void wl_output_mode(void* data, struct wl_output* wl_output, uint32_t fla
 static void wl_output_done(void* data, struct wl_output* wl_output) {
   (void)data;
   (void)wl_output;
-  g_message("AAAA");
 }
 
 static void wl_output_scale(void* data, struct wl_output* wl_output, int32_t factor) {
@@ -57,7 +54,7 @@ static void wl_output_name(void* data, struct wl_output* wl_output, const char* 
 static void wl_output_desc(void* data, struct wl_output* wl_output, const char* desc) {
   (void)data;
   (void)wl_output;
-  g_message("%s", desc);
+  (void)desc;
 }
 
 static struct wl_output_listener output_listener = {
