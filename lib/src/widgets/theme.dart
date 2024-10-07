@@ -44,13 +44,13 @@ class ExpidusThemeManagerState extends State<ExpidusThemeManager> {
       setState(() {
         _systemLight = themeData;
       });
-    });
+    }).catchError((_) {});
 
     getSystemTheme(Brightness.dark).then((themeData) {
       setState(() {
         _systemLight = themeData;
       });
-    });
+    }).catchError((_) {});
   }
 
   Color _fromMap(Map<String, int> values) =>

@@ -17,7 +17,7 @@ G_DEFINE_TYPE(ExpidusPlugin, expidus_plugin, g_object_get_type())
 
 static FlValue* get_style_color(GtkStyleContext* context, const gchar* color_name) {
   GdkRGBA color;
-	gtk_style_context_lookup_color(context, color_name, &color);
+	if (!gtk_style_context_lookup_color(context, color_name, &color)) return fl_value_new_null();
 
   FlValue* map = fl_value_new_map();
 
