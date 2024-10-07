@@ -15,13 +15,17 @@ struct _ExpidusApplication {
 G_DEFINE_TYPE(ExpidusApplication, expidus_application, GTK_TYPE_APPLICATION)
 
 static gboolean draw(GtkWidget* widget, cairo_t* cr, gpointer userdata) {
-  ExpidusApplication* app = EXPIDUS_APPLICATION(userdata);
+  ExpidusApplication* self = EXPIDUS_APPLICATION(userdata);
 
-  if (app->supports_alpha) cairo_set_source_rgba(cr, 0.0, 0.0, 0.0, 1.0);
+  cairo_save(cr);
+
+  if (self->supports_alpha) cairo_set_source_rgba(cr, 0.0, 0.0, 0.0, 0.0);
   else cairo_set_source_rgb(cr, 1.0, 1.0, 1.0);
 
   cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
   cairo_paint(cr);
+
+  cairo_restore(cr);
   return false;
 }
 
@@ -49,18 +53,19 @@ static void expidus_application_activate(GApplication* application) {
   gtk_widget_set_app_paintable(GTK_WIDGET(window), true);
   g_signal_connect(G_OBJECT(window), "draw", G_CALLBACK(draw), self);
 
-  GdkScreen* screen = gtk_widget_get_screen(GTK_WIDGET(window));
+  GdkRGBA background_color;
+  gdk_rgba_parse(&background_color, "#00000000");
+  fl_view_set_background_color(view, &background_color);
+
+  GdkScreen* screen = gdk_screen_get_default();
   GdkVisual* visual = gdk_screen_get_rgba_visual(screen);
 
-  if (visual == nullptr) {
-    visual = gdk_screen_get_system_visual(screen);
-    self->supports_alpha = false;
-  } else {
+  if (visual != nullptr && gdk_screen_is_composited(screen)) {
+    gtk_widget_set_visual(GTK_WIDGET(window), visual);
     self->supports_alpha = true;
+  } else {
+    self->supports_alpha = false;
   }
-
-  gtk_widget_set_visual(GTK_WIDGET(window), visual);
-  gtk_widget_set_visual(GTK_WIDGET(view), visual);
 
   gtk_widget_map(GTK_WIDGET(view));
   gtk_widget_grab_focus(GTK_WIDGET(view));
