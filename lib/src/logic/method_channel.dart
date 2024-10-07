@@ -16,6 +16,19 @@ class ExpidusMethodChannel {
 
   bool get hasWindowLayer => _hasWindowLayer;
 
+  Future<void> setInputShapeRegions(List<Rect> regions) async {
+    await _methodChannel.invokeMethod(
+        'setInputShapeRegions',
+        regions
+            .map((region) => {
+                  'x': region.left.toInt(),
+                  'y': region.top.toInt(),
+                  'width': region.width.toInt(),
+                  'height': region.height.toInt(),
+                })
+            .toList());
+  }
+
   Future<Size> setLayering(ExpidusWindowLayerConfig windowLayer,
       [Size size = const Size(0, 0)]) async {
     final value = await _methodChannel.invokeMethod('setLayering', {

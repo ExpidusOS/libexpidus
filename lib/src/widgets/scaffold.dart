@@ -7,6 +7,11 @@ import 'package:libadwaita_bitsdojo/libadwaita_bitsdojo.dart';
 import 'flap.dart';
 import 'headerbar.dart';
 
+typedef WrapWidgetCallback = Widget Function(
+    BuildContext context, Widget child);
+
+Widget _passthruWidgetCallback(BuildContext _, Widget child) => child;
+
 class ExpidusScaffold extends StatefulWidget {
   const ExpidusScaffold({
     super.key,
@@ -24,6 +29,7 @@ class ExpidusScaffold extends StatefulWidget {
     this.headerBarPadding,
     this.showHeaderBar,
     this.showActions,
+    this.wrapHeaderBar = _passthruWidgetCallback,
     this.backgroundImage,
     this.transparentBody,
     this.body,
@@ -43,6 +49,7 @@ class ExpidusScaffold extends StatefulWidget {
   final EdgeInsetsGeometry? headerBarPadding;
   final bool? showHeaderBar;
   final bool? showActions;
+  final WrapWidgetCallback wrapHeaderBar;
   final DecorationImage? backgroundImage;
   final bool? transparentBody;
   final Widget? body;
@@ -107,20 +114,22 @@ class _ExpidusScaffoldState extends State<ExpidusScaffold> {
             if (widget.showHeaderBar ?? true)
               Padding(
                 padding: widget.headerBarPadding ?? EdgeInsets.zero,
-                child: HeaderBar(
-                  titleWidget: (isViewSwitcherVisible && !isMobile
-                          ? widget.viewSwitcher
-                          : widget.titleWidget) ??
-                      Text((onGenerateTitle != null
-                              ? onGenerateTitle!(context)
-                              : null) ??
-                          title),
-                  end: widget.end ?? [],
-                  start: widget.start ?? [],
-                  showActions: widget.showActions,
-                  hasDrawer: isFlapVisible,
-                  onDrawerToggle: () => _flapController!.toggle(),
-                ),
+                child: widget.wrapHeaderBar(
+                    context,
+                    HeaderBar(
+                      titleWidget: (isViewSwitcherVisible && !isMobile
+                              ? widget.viewSwitcher
+                              : widget.titleWidget) ??
+                          Text((onGenerateTitle != null
+                                  ? onGenerateTitle!(context)
+                                  : null) ??
+                              title),
+                      end: widget.end ?? [],
+                      start: widget.start ?? [],
+                      showActions: widget.showActions,
+                      hasDrawer: isFlapVisible,
+                      onDrawerToggle: () => _flapController!.toggle(),
+                    )),
               ),
             Expanded(
               child: Scaffold(

@@ -12,6 +12,7 @@ export 'widgets/app.dart';
 export 'widgets/button.dart';
 export 'widgets/flap.dart';
 export 'widgets/headerbar.dart';
+export 'widgets/input_shape_region.dart';
 export 'widgets/scaffold.dart';
 export 'widgets/sidebar.dart';
 export 'widgets/theme.dart';

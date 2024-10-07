@@ -123,6 +123,26 @@ static void expidus_plugin_handle_method_call(
     g_object_get(G_OBJECT(settings), "gtk-decoration-layout", &decor_layout, nullptr);
 
     response = FL_METHOD_RESPONSE(fl_method_success_response_new(fl_value_new_string(decor_layout)));
+  } else if (strcmp(method, "setInputShapeRegions") == 0) {
+    FlValue* regions = fl_method_call_get_args(method_call);
+
+    size_t n_regions = fl_value_get_length(regions);
+
+    cairo_rectangle_int_t* rects = (cairo_rectangle_int_t*)g_malloc0(sizeof (cairo_rectangle_int_t) * n_regions);
+    for (size_t i = 0; i < n_regions; i++) {
+      FlValue* region = fl_value_get_list_value(regions, i);
+
+      rects[i] = {
+        .x = (int)fl_value_get_int(fl_value_lookup_string(region, "x")),
+        .y = (int)fl_value_get_int(fl_value_lookup_string(region, "y")),
+        .width = (int)fl_value_get_int(fl_value_lookup_string(region, "width")),
+        .height = (int)fl_value_get_int(fl_value_lookup_string(region, "height")),
+      };
+    }
+
+    gtk_widget_input_shape_combine_region(GTK_WIDGET(self->window), cairo_region_create_rectangles(rects, n_regions));
+
+    response = FL_METHOD_RESPONSE(fl_method_success_response_new(nullptr));
 #ifdef GTK_LAYER_SHELL_FOUND
   } else if (strcmp(method, "setLayering") == 0) {
     if (gtk_layer_is_supported()) {
