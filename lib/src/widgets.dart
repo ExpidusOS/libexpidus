@@ -10,6 +10,7 @@ export 'package:libadwaita/src/controllers/flap_controller.dart';
 
 export 'widgets/app.dart';
 export 'widgets/button.dart';
+export 'widgets/digital_clock.dart';
 export 'widgets/flap.dart';
 export 'widgets/headerbar.dart';
 export 'widgets/input_shape_region.dart';
