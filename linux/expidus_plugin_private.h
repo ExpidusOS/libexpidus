@@ -9,7 +9,6 @@
 struct _ExpidusPlugin {
   GObject parent_instance;
   gboolean has_layer;
-  GtkWindow* window;
   GList* monitors;
   FlPluginRegistrar* registrar;
 };
