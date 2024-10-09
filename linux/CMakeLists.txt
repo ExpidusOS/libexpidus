@@ -21,6 +21,7 @@ list(APPEND PLUGIN_SOURCES
 
 list(APPEND LIB_SOURCES
   "app.cc"
+  "win.cc"
 )
 
 # Define the plugin library target. Its name must not be changed (see comment

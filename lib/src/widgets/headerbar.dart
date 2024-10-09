@@ -82,7 +82,7 @@ class _HeaderBarState extends State<HeaderBar> {
         valueListenable: ExpidusApp.of(context).hasWindowLayer,
         builder: (context, _hasWindowLayer, _) {
           final ScaffoldState? scaffold = Scaffold.maybeOf(context);
-          final bool hasDrawer = scaffold?.hasDrawer ?? widget.hasDrawer;
+          final bool hasDrawer = widget.hasDrawer ?? scaffold?.hasDrawer ?? false;
 
           final ModalRoute<dynamic>? parentRoute = ModalRoute.of(context);
           final bool useCloseButton =

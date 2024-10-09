@@ -9,6 +9,8 @@ export 'package:flutter/material.dart'
         LinearProgressIndicator,
         Material,
         RefreshProgressIndicator,
+        ScaffoldState,
+        Scaffold,
         SimpleDialog,
         Theme,
         ThemeData,

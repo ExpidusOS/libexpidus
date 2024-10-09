@@ -71,10 +71,10 @@ class InputShapeCombineRegions extends StatefulWidget {
 
   @override
   State<InputShapeCombineRegions> createState() =>
-      _InputShapeCombineRegionsState();
+      InputShapeCombineRegionsState();
 }
 
-class _InputShapeCombineRegionsState extends State<InputShapeCombineRegions> {
+class InputShapeCombineRegionsState extends State<InputShapeCombineRegions> {
   List<StatelessElement> _regions = [];
   List<InputShapeRegion> get regions => List.unmodifiable(_regions
       .where((region) => (region.widget as InputShapeRegion).enable)
@@ -104,7 +104,7 @@ class _InputShapeCombineRegionsState extends State<InputShapeCombineRegions> {
     ));
   }
 
-  void _updateRegions() {
+  void updateRegions() {
     _regions.clear();
     _regions.addAll(_InputShapeTreeNavigator(context).elements);
 
@@ -116,7 +116,7 @@ class _InputShapeCombineRegionsState extends State<InputShapeCombineRegions> {
     super.initState();
 
     WidgetsBinding.instance!.addPostFrameCallback((_) {
-      _updateRegions();
+      updateRegions();
     });
   }
 
@@ -125,7 +125,7 @@ class _InputShapeCombineRegionsState extends State<InputShapeCombineRegions> {
     super.didUpdateWidget(oldWidget);
 
     WidgetsBinding.instance!.addPostFrameCallback((_) {
-      _updateRegions();
+      updateRegions();
     });
   }
 

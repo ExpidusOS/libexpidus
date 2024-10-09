@@ -1,8 +1,8 @@
 #pragma once
 
-#include <gtk/gtk.h>
+#include <flutter_linux/flutter_linux.h>
 
-G_DECLARE_FINAL_TYPE(ExpidusApplication, expidus_application, EXPIDUS, APPLICATION, GtkApplication)
+G_DECLARE_FINAL_TYPE(ExpidusApplication, expidus_application, EXPIDUS, APPLICATION, FlApplication)
 
 /**
  * expidus_application_new:
