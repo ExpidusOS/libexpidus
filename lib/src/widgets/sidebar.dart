@@ -14,6 +14,7 @@ class Sidebar extends StatelessWidget {
     super.key,
     required this.currentIndex,
     required this.onSelected,
+    this.borderRadius,
     this.width = 270.0,
     this.color,
     this.isDrawer = false,
@@ -34,6 +35,7 @@ class Sidebar extends StatelessWidget {
     super.key,
     required this.currentIndex,
     required this.onSelected,
+    this.borderRadius,
     this.width = 270.0,
     this.color,
     this.isDrawer = false,
@@ -65,6 +67,8 @@ class Sidebar extends StatelessWidget {
   /// Defaults to `EdgeInsets.symmetric(vertical: 5, horizontal: 6)`.
   final EdgeInsets? padding;
 
+  final BorderRadiusGeometry? borderRadius;
+
   /// Scroll controller for sidebar.
   final ScrollController? controller;
 
@@ -90,8 +94,11 @@ class Sidebar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       constraints: BoxConstraints(maxWidth: width),
-      decoration: BoxDecoration(
+      decoration: ShapeDecoration(
         color: color ?? Theme.of(context).colorScheme.primary,
+        shape: RoundedRectangleBorder(
+          borderRadius: borderRadius ?? BorderRadius.zero,
+        ),
       ),
       child: ListView(
         controller: controller,

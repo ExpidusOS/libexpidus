@@ -228,7 +228,8 @@ static void expidus_plugin_handle_method_call(
       if (auto_exclusive_zone) {
         gtk_layer_auto_exclusive_zone_enable(self->window);
       } else {
-        gtk_layer_set_exclusive_zone(self->window, 0);
+        gint exclusive_zone = fl_value_get_int(fl_value_lookup_string(args, "exclusiveZone"));
+        gtk_layer_set_exclusive_zone(self->window, exclusive_zone);
       }
 
       gboolean fixed_size = fl_value_get_bool(fl_value_lookup_string(args, "fixedSize"));

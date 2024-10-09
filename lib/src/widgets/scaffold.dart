@@ -26,6 +26,7 @@ class ExpidusScaffold extends StatefulWidget {
     this.viewSwitcherConstraint,
     this.start,
     this.end,
+    this.headerBar,
     this.headerBarPadding,
     this.showHeaderBar,
     this.showActions,
@@ -46,6 +47,7 @@ class ExpidusScaffold extends StatefulWidget {
   final double? viewSwitcherConstraint;
   final List<Widget>? start;
   final List<Widget>? end;
+  final Widget? headerBar;
   final EdgeInsetsGeometry? headerBarPadding;
   final bool? showHeaderBar;
   final bool? showActions;
@@ -112,25 +114,26 @@ class _ExpidusScaffoldState extends State<ExpidusScaffold> {
         child: Column(
           children: [
             if (widget.showHeaderBar ?? true)
-              Padding(
-                padding: widget.headerBarPadding ?? EdgeInsets.zero,
-                child: widget.wrapHeaderBar(
-                    context,
-                    HeaderBar(
-                      titleWidget: (isViewSwitcherVisible && !isMobile
-                              ? widget.viewSwitcher
-                              : widget.titleWidget) ??
-                          Text((onGenerateTitle != null
-                                  ? onGenerateTitle!(context)
-                                  : null) ??
-                              title),
-                      end: widget.end ?? [],
-                      start: widget.start ?? [],
-                      showActions: widget.showActions,
-                      hasDrawer: isFlapVisible,
-                      onDrawerToggle: () => _flapController!.toggle(),
-                    )),
-              ),
+              widget.headerBar ??
+                  Padding(
+                    padding: widget.headerBarPadding ?? EdgeInsets.zero,
+                    child: widget.wrapHeaderBar(
+                        context,
+                        HeaderBar(
+                          titleWidget: (isViewSwitcherVisible && !isMobile
+                                  ? widget.viewSwitcher
+                                  : widget.titleWidget) ??
+                              Text((onGenerateTitle != null
+                                      ? onGenerateTitle!(context)
+                                      : null) ??
+                                  title),
+                          end: widget.end ?? [],
+                          start: widget.start ?? [],
+                          showActions: widget.showActions,
+                          hasDrawer: isFlapVisible,
+                          onDrawerToggle: () => _flapController!.toggle(),
+                        )),
+                  ),
             Expanded(
               child: Scaffold(
                 key: widget.scaffoldKey,

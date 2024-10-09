@@ -36,6 +36,7 @@ class ExpidusWindowLayerConfig {
     this.layer = ExpidusWindowLayer.top,
     this.monitor,
     this.autoExclusiveZone = false,
+    this.exclusiveZone = 0,
     this.fixedSize = false,
     this.keyboardMode = ExpidusWindowLayerKeyboardMode.none,
     this.top = const ExpidusWindowLayerAnchor(),
@@ -47,6 +48,7 @@ class ExpidusWindowLayerConfig {
   final ExpidusWindowLayer layer;
   final String? monitor;
   final bool autoExclusiveZone;
+  final int exclusiveZone;
   final bool fixedSize;
   final ExpidusWindowLayerKeyboardMode keyboardMode;
   final ExpidusWindowLayerAnchor top;
@@ -58,6 +60,7 @@ class ExpidusWindowLayerConfig {
         'layer': layer.name,
         'monitor': monitor,
         'autoExclusiveZone': autoExclusiveZone,
+        'exclusiveZone': exclusiveZone,
         'fixedSize': fixedSize,
         'keyboardMode': keyboardMode.name,
         'top': top.toJSON(),
