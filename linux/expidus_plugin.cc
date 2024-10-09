@@ -227,7 +227,7 @@ static void expidus_plugin_handle_method_call(
         if (fl_value_get_bool(fl_value_lookup_string(fl_value_lookup_string(args, "left"), "toEdge")) && fl_value_get_bool(fl_value_lookup_string(fl_value_lookup_string(args, "right"), "toEdge"))) {
           width = geom.width - (fl_value_get_int(fl_value_lookup_string(fl_value_lookup_string(args, "left"), "margin")) + fl_value_get_int(fl_value_lookup_string(fl_value_lookup_string(args, "right"), "margin")));
         } else if (width == 0) {
-          width = geom.height;
+          width = geom.width;
         }
       }
 
@@ -275,7 +275,12 @@ static void expidus_plugin_handle_method_call(
       set_layer_anchor(window, fl_value_lookup_string(args, "right"), GTK_LAYER_SHELL_EDGE_RIGHT);
 
       gtk_widget_set_size_request(GTK_WIDGET(window), width, height);
-      gtk_widget_show_all(GTK_WIDGET(window));
+
+      if (gtk_widget_is_visible(GTK_WIDGET(window))) {
+        gtk_window_resize(window, width, height);
+      } else {
+        gtk_widget_show_all(GTK_WIDGET(window));
+      }
 
       FlValue* value = fl_value_new_map();
       fl_value_set_string_take(value, "width", fl_value_new_int(width));
