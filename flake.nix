@@ -2,7 +2,7 @@
   description = "ExpidusOS library";
 
   inputs = {
-    nixpkgs.url = "github:ExpidusOS/nixpkgs/feat/flutter-3-26-pre";
+    nixpkgs.url = "github:NixOS/nixpkgs";
     systems.url = "github:nix-systems/default-linux";
     flake-utils.url = "github:numtide/flake-utils";
   };
@@ -14,7 +14,7 @@
       in {
         devShells.default = pkgs.mkShell {
           packages = with pkgs; [
-            flutter326
+            flutter327
             pkg-config
             gtk3
             gtk-layer-shell

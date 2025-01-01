@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'dart:io';
 
 import 'package:bitsdojo_window/bitsdojo_window.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/widgets.dart' hide runApp;
 
 import 'logic/layering.dart';
@@ -23,7 +24,7 @@ void runApp(ExpidusAppConfig appConfig) {
   final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   final methodChannel = ExpidusMethodChannel.ensureInitialized();
 
-  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+  if (!kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
     if (appConfig.windowLayer != null && Platform.isLinux) {
       methodChannel.setLayering(
           appConfig.windowLayer!, appConfig.windowSize ?? const Size(0, 0));

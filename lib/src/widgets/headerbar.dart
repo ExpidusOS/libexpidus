@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart'
-    show defaultTargetPlatform, TargetPlatform;
+    show defaultTargetPlatform, TargetPlatform, kIsWeb;
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
 import 'package:libadwaita/libadwaita.dart';
@@ -41,7 +41,8 @@ class _HeaderBarState extends State<HeaderBar> {
 
   bool _showActions(BuildContext context) =>
       widget.showActions ??
-      (defaultTargetPlatform == TargetPlatform.linux ||
+      (!kIsWeb ||
+              defaultTargetPlatform == TargetPlatform.linux ||
               defaultTargetPlatform == TargetPlatform.macOS ||
               defaultTargetPlatform == TargetPlatform.windows) &&
           !ExpidusApp.hasWindowLayer(context);
@@ -67,7 +68,9 @@ class _HeaderBarState extends State<HeaderBar> {
           );
       }
 
-      if (defaultTargetPlatform == TargetPlatform.macOS) {
+      if (kIsWeb) {
+        updateSep(':');
+      } else if (defaultTargetPlatform == TargetPlatform.macOS) {
         updateSep('close,minimize,maximize:menu');
       } else {
         ExpidusMethodChannel.instance.getHeaderBarLayout().then((order) {
@@ -82,7 +85,8 @@ class _HeaderBarState extends State<HeaderBar> {
         valueListenable: ExpidusApp.of(context).hasWindowLayer,
         builder: (context, _hasWindowLayer, _) {
           final ScaffoldState? scaffold = Scaffold.maybeOf(context);
-          final bool hasDrawer = widget.hasDrawer ?? scaffold?.hasDrawer ?? false;
+          final bool hasDrawer =
+              widget.hasDrawer ?? scaffold?.hasDrawer ?? false;
 
           final ModalRoute<dynamic>? parentRoute = ModalRoute.of(context);
           final bool useCloseButton =
@@ -163,8 +167,9 @@ class _HeaderBarState extends State<HeaderBar> {
                                   for (var i in sep[0].split(','))
                                     if (windowButtons[i] != null)
                                       windowButtons[i]!,
-                                  if (defaultTargetPlatform ==
-                                      TargetPlatform.linux)
+                                  if (!kIsWeb &&
+                                      defaultTargetPlatform ==
+                                          TargetPlatform.linux)
                                     SizedBox(width: 6),
                                 ],
                                 ...widget.start.map(
@@ -199,8 +204,9 @@ class _HeaderBarState extends State<HeaderBar> {
                                   for (var i in sep[1].split(','))
                                     if (windowButtons[i] != null)
                                       windowButtons[i]!,
-                                  if (defaultTargetPlatform ==
-                                      TargetPlatform.linux)
+                                  if (!kIsWeb &&
+                                      defaultTargetPlatform ==
+                                          TargetPlatform.linux)
                                     SizedBox(width: 6),
                                 ],
                               ],

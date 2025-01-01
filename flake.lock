@@ -5,11 +5,11 @@
         "systems": "systems"
       },
       "locked": {
-        "lastModified": 1726560853,
-        "narHash": "sha256-X6rJYSESBVr3hBoH0WbKE5KvhPU5bloyZ2L4K60/fPQ=",
+        "lastModified": 1731533236,
+        "narHash": "sha256-l0KFg5HjrsfsO/JpG+r7fRrqm12kzFHyUHqHCVpMMbI=",
         "owner": "numtide",
         "repo": "flake-utils",
-        "rev": "c1dfcf08411b08f6b8615f7d8971a2bfa81d5e8a",
+        "rev": "11707dc2f618dd54ca8739b309ec4fc024de578b",
         "type": "github"
       },
       "original": {
@@ -20,16 +20,15 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1728324271,
-        "narHash": "sha256-jHyqTdZXFZuBlD2HkreZJXgBaXBtrLLvnhve8+bQOVA=",
-        "owner": "ExpidusOS",
+        "lastModified": 1735710708,
+        "narHash": "sha256-Qja2hQ0c25L6LO1Tp5x4dQ/wSFLKYhSO70+48Q+J3vc=",
+        "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "9d5adb9e4586867342671b9baa296731cd75d874",
+        "rev": "82d084b9146451db448c6c108172242dd9c33a7c",
         "type": "github"
       },
       "original": {
-        "owner": "ExpidusOS",
-        "ref": "feat/flutter-3-26-pre",
+        "owner": "NixOS",
         "repo": "nixpkgs",
         "type": "github"
       }
