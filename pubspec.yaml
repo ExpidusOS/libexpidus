@@ -54,9 +54,6 @@ flutter:
         pluginClass: ExpidusPlugin
       windows:
         pluginClass: ExpidusPluginCApi
-      web:
-        pluginClass: ExpidusWeb
-        fileName: expidus_web.dart
 
   # To add assets to your plugin package, add an assets section, like this:
   # assets:
