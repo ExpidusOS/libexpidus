@@ -71,21 +71,22 @@ static void expidus_plugin_handle_method_call(
   const gchar* method = fl_method_call_get_name(method_call);
 
   if (strcmp(method, "getSystemTheme") == 0) {
-    FlValue* arg_is_dark = fl_method_call_get_args(method_call);
-    bool is_dark = fl_value_get_bool(arg_is_dark);
-
     FlView* view = fl_plugin_registrar_get_view(self->registrar);
 
     GtkSettings* settings = gtk_settings_get_for_screen(gtk_widget_get_screen(GTK_WIDGET(view)));
 
     gchar* theme_name = nullptr;
     gchar* font_name = nullptr;
-    g_object_get(G_OBJECT(settings), "gtk-theme-name", &theme_name, "gtk-font-name", &font_name, nullptr);
+    gboolean prefer_dark = FALSE;
+    g_object_get(
+        G_OBJECT(settings),
+        "gtk-theme-name", &theme_name,
+        "gtk-font-name", &font_name,
+        "gtk-application-prefer-dark-theme", &prefer_dark,
+        nullptr);
 
-    GtkCssProvider* provider = gtk_css_provider_get_named(theme_name, is_dark ? "dark" : nullptr);
-
-	  GtkStyleContext* context = gtk_style_context_new();
-    gtk_style_context_add_provider(context, GTK_STYLE_PROVIDER(g_object_ref(provider)), GTK_STYLE_PROVIDER_PRIORITY_THEME);
+    GtkStyleContext* context = gtk_style_context_new();
+    gtk_style_context_add_provider(context, GTK_STYLE_PROVIDER(settings), GTK_STYLE_PROVIDER_PRIORITY_THEME);
 
     g_autoptr(FlValue) theme = fl_value_new_map();
 
@@ -110,19 +111,11 @@ static void expidus_plugin_handle_method_call(
     }
 
     fl_value_set_string_take(theme, "colorScheme", get_color_theme(context));
+    fl_value_set_string_take(theme, "dark", fl_value_new_bool(prefer_dark));
 
     g_object_unref(context);
 
     response = FL_METHOD_RESPONSE(fl_method_success_response_new(theme));
-  } else if (strcmp(method, "useDarkTheme") == 0) {
-    FlView* view = fl_plugin_registrar_get_view(self->registrar);
-
-    GtkSettings* settings = gtk_settings_get_for_screen(gtk_widget_get_screen(GTK_WIDGET(view)));
-
-    gboolean prefer_dark = FALSE;
-    g_object_get(G_OBJECT(settings), "gtk-application-prefer-dark-theme", &prefer_dark, nullptr);
-
-    response = FL_METHOD_RESPONSE(fl_method_success_response_new(fl_value_new_bool(prefer_dark)));
   } else if (strcmp(method, "getHeaderBarLayout") == 0) {
     FlView* view = fl_plugin_registrar_get_view(self->registrar);
 

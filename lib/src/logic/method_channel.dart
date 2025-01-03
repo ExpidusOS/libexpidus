@@ -45,13 +45,9 @@ class ExpidusMethodChannel {
       .invokeMethod<String>('getHeaderBarLayout')
       .then((value) => value!);
 
-  Future<bool> useDarkTheme() =>
-      _methodChannel.invokeMethod<bool>('useDarkTheme').then((value) => value!);
-
-  Future<Map<String, dynamic>> getSystemTheme(Brightness brightness) =>
+  Future<Map<String, dynamic>> getSystemTheme() =>
       _methodChannel
-          .invokeMapMethod<String, dynamic>(
-              'getSystemTheme', brightness == Brightness.dark)
+          .invokeMapMethod<String, dynamic>('getSystemTheme')
           .then((value) => value!);
 
   static ExpidusMethodChannel? _instance;

@@ -21,19 +21,14 @@ class ExpidusThemeManager extends StatefulWidget {
 }
 
 class ExpidusThemeManagerState extends State<ExpidusThemeManager> {
-  ThemeData? _systemDark;
-  ThemeData? _systemLight;
-  ThemeMode? _setThemeMode;
+  ThemeData? _system;
 
   ThemeMode get themeMode =>
-      widget.themeMode ?? _setThemeMode ?? ThemeMode.light;
+      widget.themeMode ?? ThemeMode.light;
 
   ThemeData _fallbackFor(Brightness brightness) => brightness == Brightness.dark
       ? AdwaitaThemeData.dark()
       : AdwaitaThemeData.light();
-
-  ThemeData? _systemFor(Brightness brightness) =>
-      brightness == Brightness.dark ? _systemDark : _systemLight;
 
   Brightness _brightnessFor(BuildContext context) =>
       themeMode == ThemeMode.system
@@ -44,42 +39,16 @@ class ExpidusThemeManagerState extends State<ExpidusThemeManager> {
   void initState() {
     super.initState();
 
-    getSystemTheme(Brightness.light).then((themeData) {
+    getSystemTheme().then((themeData) {
       setState(() {
-        _systemLight = themeData;
+        _system = themeData;
       });
     }).catchError((exception, stack) {
       FlutterError.reportError(FlutterErrorDetails(
         exception: exception,
         stack: stack,
         library: 'expidus',
-        context: ErrorDescription('getSystemTheme(Brightness.light)'),
-      ));
-    });
-
-    getSystemTheme(Brightness.dark).then((themeData) {
-      setState(() {
-        _systemDark = themeData;
-      });
-    }).catchError((exception, stack) {
-      FlutterError.reportError(FlutterErrorDetails(
-        exception: exception,
-        stack: stack,
-        library: 'expidus',
-        context: ErrorDescription('getSystemTheme(Brightness.light)'),
-      ));
-    });
-
-    ExpidusMethodChannel.instance.useDarkTheme().then((value) {
-      setState(() {
-        _setThemeMode = value ? ThemeMode.dark : ThemeMode.light;
-      });
-    }).catchError((exception, stack) {
-      FlutterError.reportError(FlutterErrorDetails(
-        exception: exception,
-        stack: stack,
-        library: 'expidus',
-        context: ErrorDescription('useDarkMode'),
+        context: ErrorDescription('getSystemTheme'),
       ));
     });
   }
@@ -90,8 +59,9 @@ class ExpidusThemeManagerState extends State<ExpidusThemeManager> {
   Color? _decode(dynamic value) =>
       value == null ? null : _fromMap(value.cast<String, int>());
 
-  Future<ThemeData> getSystemTheme(Brightness brightness) async {
-    final data = await ExpidusMethodChannel.instance.getSystemTheme(brightness);
+  Future<ThemeData> getSystemTheme() async {
+    final data = await ExpidusMethodChannel.instance.getSystemTheme();
+    final brightness = data['dark'] ? Brightness.dark : Brightness.light;
     final fb = _fallbackFor(brightness);
 
     final colorScheme = ColorScheme(
@@ -116,69 +86,69 @@ class ExpidusThemeManagerState extends State<ExpidusThemeManager> {
 
     final textTheme = TextTheme(
       displayLarge: GoogleFonts.mPlus1p(
-        color: _decode(data['text']['color']),
+        color: _decode(data['text']['color']) ?? fb.textTheme.displayLarge!.color,
         fontSize: 57,
       ),
       displayMedium: GoogleFonts.mPlus1p(
-        color: _decode(data['text']['color']),
+        color: _decode(data['text']['color']) ?? fb.textTheme.displayMedium!.color,
         fontSize: 45,
       ),
       displaySmall: GoogleFonts.mPlus1p(
-        color: _decode(data['text']['color']),
+        color: _decode(data['text']['color']) ?? fb.textTheme.displaySmall!.color,
         fontSize: 36,
       ),
       headlineLarge: GoogleFonts.mPlus1p(
-        color: _decode(data['text']['color']),
+        color: _decode(data['text']['color']) ?? fb.textTheme.headlineLarge!.color,
         fontSize: 32,
         fontStyle: FontStyle.italic,
       ),
       headlineMedium: GoogleFonts.mPlus1p(
-        color: _decode(data['text']['color']),
+        color: _decode(data['text']['color']) ?? fb.textTheme.headlineMedium!.color,
         fontSize: 28,
         fontStyle: FontStyle.italic,
       ),
       headlineSmall: GoogleFonts.mPlus1p(
-        color: _decode(data['text']['color']),
+        color: _decode(data['text']['color']) ?? fb.textTheme.headlineSmall!.color,
         fontSize: 24,
         fontStyle: FontStyle.italic,
       ),
       titleLarge: GoogleFonts.mPlus1p(
-        color: _decode(data['text']['color']),
+        color: _decode(data['text']['color']) ?? fb.textTheme.titleLarge!.color,
         fontSize: 24,
         fontWeight: FontWeight.bold,
       ),
       titleMedium: GoogleFonts.mPlus1p(
-        color: _decode(data['text']['color']),
+        color: _decode(data['text']['color']) ?? fb.textTheme.titleMedium!.color,
         fontSize: 20,
         fontWeight: FontWeight.bold,
       ),
       titleSmall: GoogleFonts.mPlus1p(
-        color: _decode(data['text']['color']),
+        color: _decode(data['text']['color']) ?? fb.textTheme.titleSmall!.color,
         fontSize: 18,
         fontWeight: FontWeight.bold,
       ),
       bodyLarge: GoogleFonts.mPlus1p(
-        color: _decode(data['text']['color']),
+        color: _decode(data['text']['color']) ?? fb.textTheme.bodyLarge!.color,
         fontSize: 17,
       ),
       bodyMedium: GoogleFonts.mPlus1p(
-        color: _decode(data['text']['color']),
+        color: _decode(data['text']['color']) ?? fb.textTheme.bodyMedium!.color,
         fontSize: 15,
       ),
       bodySmall: GoogleFonts.mPlus1p(
-        color: _decode(data['text']['color']),
+        color: _decode(data['text']['color']) ?? fb.textTheme.bodySmall!.color,
         fontSize: 12,
       ),
       labelLarge: GoogleFonts.mPlus1p(
-        color: _decode(data['text']['color']),
+        color: _decode(data['text']['color']) ?? fb.textTheme.labelLarge!.color,
         fontSize: 16,
       ),
       labelMedium: GoogleFonts.mPlus1p(
-        color: _decode(data['text']['color']),
+        color: _decode(data['text']['color']) ?? fb.textTheme.labelMedium!.color,
         fontSize: 14,
       ),
       labelSmall: GoogleFonts.mPlus1p(
-        color: _decode(data['text']['color']),
+        color: _decode(data['text']['color']) ?? fb.textTheme.labelSmall!.color,
         fontSize: 12,
       ),
     );
@@ -187,9 +157,9 @@ class ExpidusThemeManagerState extends State<ExpidusThemeManager> {
       colorScheme: colorScheme,
       textTheme: textTheme,
       appBarTheme: AppBarTheme(
-        backgroundColor: _decode(data['appBar']['background']),
-        foregroundColor: _decode(data['appBar']['foreground']),
-        shadowColor: _decode(data['appBar']['shadow']),
+        backgroundColor: _decode(data['appBar']['background']) ?? fb.appBarTheme.backgroundColor,
+        foregroundColor: _decode(data['appBar']['foreground']) ?? fb.appBarTheme.foregroundColor,
+        shadowColor: _decode(data['appBar']['shadow']) ?? fb.appBarTheme.shadowColor,
         shape: Border.all(
             width: 1.0,
             color: _decode(data['appBar']['border']) ?? Colors.black),
@@ -206,7 +176,7 @@ class ExpidusThemeManagerState extends State<ExpidusThemeManager> {
 
   @override
   Widget build(BuildContext context) => Theme(
-        data: _systemFor(_brightnessFor(context)) ??
+        data: _system ??
             _fallbackFor(_brightnessFor(context)),
         child: widget.child,
       );
