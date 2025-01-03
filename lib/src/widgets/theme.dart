@@ -23,18 +23,22 @@ class ExpidusThemeManager extends StatefulWidget {
 class ExpidusThemeManagerState extends State<ExpidusThemeManager> {
   ThemeData? _systemDark;
   ThemeData? _systemLight;
+  ThemeMode? _setThemeMode;
 
-  ThemeMode get themeMode => widget.themeMode ?? ThemeMode.light;
+  ThemeMode get themeMode =>
+      widget.themeMode ?? _setThemeMode ?? ThemeMode.light;
 
-  bool get _hasSystemColorSchemes =>
-      _systemDark != null || _systemLight != null;
-
-  ThemeData? get system =>
-      themeMode == ThemeMode.dark ? _systemDark : _systemLight;
-  ThemeData get fallback => themeMode == ThemeMode.dark
+  ThemeData _fallbackFor(Brightness brightness) => brightness == Brightness.dark
       ? AdwaitaThemeData.dark()
       : AdwaitaThemeData.light();
-  ThemeData get data => system ?? fallback;
+
+  ThemeData? _systemFor(Brightness brightness) =>
+      brightness == Brightness.dark ? _systemDark : _systemLight;
+
+  Brightness _brightnessFor(BuildContext context) =>
+      themeMode == ThemeMode.system
+          ? MediaQuery.platformBrightnessOf(context)
+          : (themeMode == ThemeMode.dark ? Brightness.dark : Brightness.light);
 
   @override
   void initState() {
@@ -44,100 +48,137 @@ class ExpidusThemeManagerState extends State<ExpidusThemeManager> {
       setState(() {
         _systemLight = themeData;
       });
-    }).catchError((_) {});
+    }).catchError((exception, stack) {
+      FlutterError.reportError(FlutterErrorDetails(
+        exception: exception,
+        stack: stack,
+        library: 'expidus',
+        context: ErrorDescription('getSystemTheme(Brightness.light)'),
+      ));
+    });
 
     getSystemTheme(Brightness.dark).then((themeData) {
       setState(() {
-        _systemLight = themeData;
+        _systemDark = themeData;
       });
-    }).catchError((_) {});
+    }).catchError((exception, stack) {
+      FlutterError.reportError(FlutterErrorDetails(
+        exception: exception,
+        stack: stack,
+        library: 'expidus',
+        context: ErrorDescription('getSystemTheme(Brightness.light)'),
+      ));
+    });
+
+    ExpidusMethodChannel.instance.useDarkTheme().then((value) {
+      setState(() {
+        _setThemeMode = value ? ThemeMode.dark : ThemeMode.light;
+      });
+    }).catchError((exception, stack) {
+      FlutterError.reportError(FlutterErrorDetails(
+        exception: exception,
+        stack: stack,
+        library: 'expidus',
+        context: ErrorDescription('useDarkMode'),
+      ));
+    });
   }
 
   Color _fromMap(Map<String, int> values) =>
       Color.fromARGB(values['A']!, values['R']!, values['G']!, values['B']!);
 
+  Color? _decode(dynamic value) =>
+      value == null ? null : _fromMap(value.cast<String, int>());
+
   Future<ThemeData> getSystemTheme(Brightness brightness) async {
     final data = await ExpidusMethodChannel.instance.getSystemTheme(brightness);
+    final fb = _fallbackFor(brightness);
 
     final colorScheme = ColorScheme(
-      primary: _fromMap(data['colorScheme']['primary'].cast<String, int>()),
-      onPrimary: _fromMap(data['colorScheme']['onPrimary'].cast<String, int>()),
-      secondary: _fromMap(data['colorScheme']['secondary'].cast<String, int>()),
-      onSecondary:
-          _fromMap(data['colorScheme']['onSecondary'].cast<String, int>()),
-      error: _fromMap(data['colorScheme']['error'].cast<String, int>()),
-      onError: _fromMap(data['colorScheme']['onError'].cast<String, int>()),
-      surface: _fromMap(data['colorScheme']['surface'].cast<String, int>()),
-      onSurface: _fromMap(data['colorScheme']['onSurface'].cast<String, int>()),
-      outline: _fromMap(data['colorScheme']['outline'].cast<String, int>()),
+      primary:
+          _decode(data['colorScheme']['primary']) ?? fb.colorScheme.primary,
+      onPrimary:
+          _decode(data['colorScheme']['onPrimary']) ?? fb.colorScheme.onPrimary,
+      secondary:
+          _decode(data['colorScheme']['secondary']) ?? fb.colorScheme.secondary,
+      onSecondary: _decode(data['colorScheme']['onSecondary']) ??
+          fb.colorScheme.onSecondary,
+      error: _decode(data['colorScheme']['error']) ?? fb.colorScheme.error,
+      onError:
+          _decode(data['colorScheme']['onError']) ?? fb.colorScheme.onError,
+      surface:
+          _decode(data['colorScheme']['surface']) ?? fb.colorScheme.surface,
+      onSurface:
+          _decode(data['colorScheme']['onSurface']) ?? fb.colorScheme.onSurface,
+      outline: _decode(data['colorScheme']['outline']),
       brightness: brightness,
     );
 
     final textTheme = TextTheme(
       displayLarge: GoogleFonts.mPlus1p(
-        color: _fromMap(data['text']['color'].cast<String, int>()),
+        color: _decode(data['text']['color']),
         fontSize: 57,
       ),
       displayMedium: GoogleFonts.mPlus1p(
-        color: _fromMap(data['text']['color'].cast<String, int>()),
+        color: _decode(data['text']['color']),
         fontSize: 45,
       ),
       displaySmall: GoogleFonts.mPlus1p(
-        color: _fromMap(data['text']['color'].cast<String, int>()),
+        color: _decode(data['text']['color']),
         fontSize: 36,
       ),
       headlineLarge: GoogleFonts.mPlus1p(
-        color: _fromMap(data['text']['color'].cast<String, int>()),
+        color: _decode(data['text']['color']),
         fontSize: 32,
         fontStyle: FontStyle.italic,
       ),
       headlineMedium: GoogleFonts.mPlus1p(
-        color: _fromMap(data['text']['color'].cast<String, int>()),
+        color: _decode(data['text']['color']),
         fontSize: 28,
         fontStyle: FontStyle.italic,
       ),
       headlineSmall: GoogleFonts.mPlus1p(
-        color: _fromMap(data['text']['color'].cast<String, int>()),
+        color: _decode(data['text']['color']),
         fontSize: 24,
         fontStyle: FontStyle.italic,
       ),
       titleLarge: GoogleFonts.mPlus1p(
-        color: _fromMap(data['text']['color'].cast<String, int>()),
+        color: _decode(data['text']['color']),
         fontSize: 24,
         fontWeight: FontWeight.bold,
       ),
       titleMedium: GoogleFonts.mPlus1p(
-        color: _fromMap(data['text']['color'].cast<String, int>()),
+        color: _decode(data['text']['color']),
         fontSize: 20,
         fontWeight: FontWeight.bold,
       ),
       titleSmall: GoogleFonts.mPlus1p(
-        color: _fromMap(data['text']['color'].cast<String, int>()),
+        color: _decode(data['text']['color']),
         fontSize: 18,
         fontWeight: FontWeight.bold,
       ),
       bodyLarge: GoogleFonts.mPlus1p(
-        color: _fromMap(data['text']['color'].cast<String, int>()),
+        color: _decode(data['text']['color']),
         fontSize: 17,
       ),
       bodyMedium: GoogleFonts.mPlus1p(
-        color: _fromMap(data['text']['color'].cast<String, int>()),
+        color: _decode(data['text']['color']),
         fontSize: 15,
       ),
       bodySmall: GoogleFonts.mPlus1p(
-        color: _fromMap(data['text']['color'].cast<String, int>()),
+        color: _decode(data['text']['color']),
         fontSize: 12,
       ),
       labelLarge: GoogleFonts.mPlus1p(
-        color: _fromMap(data['text']['color'].cast<String, int>()),
+        color: _decode(data['text']['color']),
         fontSize: 16,
       ),
       labelMedium: GoogleFonts.mPlus1p(
-        color: _fromMap(data['text']['color'].cast<String, int>()),
+        color: _decode(data['text']['color']),
         fontSize: 14,
       ),
       labelSmall: GoogleFonts.mPlus1p(
-        color: _fromMap(data['text']['color'].cast<String, int>()),
+        color: _decode(data['text']['color']),
         fontSize: 12,
       ),
     );
@@ -146,23 +187,18 @@ class ExpidusThemeManagerState extends State<ExpidusThemeManager> {
       colorScheme: colorScheme,
       textTheme: textTheme,
       appBarTheme: AppBarTheme(
-        backgroundColor:
-            _fromMap(data['appBar']['background'].cast<String, int>()),
-        foregroundColor:
-            _fromMap(data['appBar']['foreground'].cast<String, int>()),
-        shadowColor: _fromMap(data['appBar']['shadow'].cast<String, int>()),
+        backgroundColor: _decode(data['appBar']['background']),
+        foregroundColor: _decode(data['appBar']['foreground']),
+        shadowColor: _decode(data['appBar']['shadow']),
         shape: Border.all(
             width: 1.0,
-            color: _fromMap(data['appBar']['border'].cast<String, int>())),
+            color: _decode(data['appBar']['border']) ?? Colors.black),
       ),
       buttonTheme: ButtonThemeData(
-        buttonColor:
-            _fromMap(data['colorScheme']['accent'].cast<String, int>()),
+        buttonColor: _decode(data['colorScheme']['accent']),
         colorScheme: colorScheme.copyWith(
-            primary:
-                _fromMap(data['colorScheme']['accent'].cast<String, int>()),
-            onPrimary:
-                _fromMap(data['colorScheme']['onAccent'].cast<String, int>())),
+            primary: _decode(data['colorScheme']['accent']),
+            onPrimary: _decode(data['colorScheme']['onAccent'])),
         padding: const EdgeInsets.all(6.0),
       ),
     );
@@ -170,7 +206,8 @@ class ExpidusThemeManagerState extends State<ExpidusThemeManager> {
 
   @override
   Widget build(BuildContext context) => Theme(
-        data: data,
+        data: _systemFor(_brightnessFor(context)) ??
+            _fallbackFor(_brightnessFor(context)),
         child: widget.child,
       );
 }

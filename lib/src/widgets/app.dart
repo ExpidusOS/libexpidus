@@ -26,6 +26,7 @@ class ExpidusApp extends StatefulWidget {
     this.maxWindowSize,
     this.windowSize,
     this.onWindowReady,
+    this.themeMode,
   });
 
   final String title;
@@ -43,6 +44,7 @@ class ExpidusApp extends StatefulWidget {
   final Size? maxWindowSize;
   final Size? windowSize;
   final VoidCallback? onWindowReady;
+  final ThemeMode? themeMode;
 
   @override
   State<ExpidusApp> createState() => ExpidusAppState();
@@ -100,20 +102,25 @@ class ExpidusAppState extends State<ExpidusApp> {
   }
 
   @override
-  Widget build(BuildContext context) => MaterialApp(
-        key: _appKey,
-        title: widget.title,
-        onGenerateTitle: widget.onGenerateTitle,
-        navigatorObservers: widget.navigatorObservers,
-        localizationsDelegates: widget.localizationsDelegates,
-        localeListResolutionCallback: widget.localeListResolutionCallback,
-        localeResolutionCallback: widget.localeResolutionCallback,
-        supportedLocales: widget.supportedLocales,
-        home: widget.home != null
-            ? ExpidusThemeManager(child: widget.home!)
-            : null,
-        routes: widget.routes.map((k, v) =>
-            MapEntry(k, (context) => ExpidusThemeManager(child: v(context)))),
-        initialRoute: widget.initialRoute,
+  Widget build(BuildContext context) => ExpidusThemeManager(
+        themeMode: widget.themeMode,
+        child: Builder(
+          builder: (context) => MaterialApp(
+            key: _appKey,
+            title: widget.title,
+            onGenerateTitle: widget.onGenerateTitle,
+            navigatorObservers: widget.navigatorObservers,
+            localizationsDelegates: widget.localizationsDelegates,
+            localeListResolutionCallback: widget.localeListResolutionCallback,
+            localeResolutionCallback: widget.localeResolutionCallback,
+            supportedLocales: widget.supportedLocales,
+            home: widget.home,
+            routes: widget.routes,
+            initialRoute: widget.initialRoute,
+            themeMode: widget.themeMode,
+            theme: Theme.of(context),
+            darkTheme: Theme.of(context),
+          ),
+        ),
       );
 }

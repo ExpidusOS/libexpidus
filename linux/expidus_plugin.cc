@@ -85,7 +85,7 @@ static void expidus_plugin_handle_method_call(
     GtkCssProvider* provider = gtk_css_provider_get_named(theme_name, is_dark ? "dark" : nullptr);
 
 	  GtkStyleContext* context = gtk_style_context_new();
-    gtk_style_context_add_provider(context, GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_THEME);
+    gtk_style_context_add_provider(context, GTK_STYLE_PROVIDER(g_object_ref(provider)), GTK_STYLE_PROVIDER_PRIORITY_THEME);
 
     g_autoptr(FlValue) theme = fl_value_new_map();
 
@@ -114,6 +114,15 @@ static void expidus_plugin_handle_method_call(
     g_object_unref(context);
 
     response = FL_METHOD_RESPONSE(fl_method_success_response_new(theme));
+  } else if (strcmp(method, "useDarkTheme") == 0) {
+    FlView* view = fl_plugin_registrar_get_view(self->registrar);
+
+    GtkSettings* settings = gtk_settings_get_for_screen(gtk_widget_get_screen(GTK_WIDGET(view)));
+
+    gboolean prefer_dark = FALSE;
+    g_object_get(G_OBJECT(settings), "gtk-application-prefer-dark-theme", &prefer_dark, nullptr);
+
+    response = FL_METHOD_RESPONSE(fl_method_success_response_new(fl_value_new_bool(prefer_dark)));
   } else if (strcmp(method, "getHeaderBarLayout") == 0) {
     FlView* view = fl_plugin_registrar_get_view(self->registrar);
 
