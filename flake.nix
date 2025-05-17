@@ -14,7 +14,7 @@
       in {
         devShells.default = pkgs.mkShell {
           packages = with pkgs; [
-            flutter327
+            flutter
             pkg-config
             gtk3
             gtk-layer-shell

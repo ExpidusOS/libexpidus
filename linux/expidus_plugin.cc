@@ -15,43 +15,6 @@
 
 G_DEFINE_TYPE(ExpidusPlugin, expidus_plugin, g_object_get_type())
 
-static FlValue* get_style_color(GtkStyleContext* context, const gchar* color_name) {
-  GdkRGBA color;
-	if (!gtk_style_context_lookup_color(context, color_name, &color)) return fl_value_new_null();
-
-  FlValue* map = fl_value_new_map();
-
-	fl_value_set_string_take(map, "R", fl_value_new_int((int) (color.red * 255)));
-	fl_value_set_string_take(map, "G", fl_value_new_int((int) (color.green * 255)));
-	fl_value_set_string_take(map, "B", fl_value_new_int((int) (color.blue * 255)));
-	fl_value_set_string_take(map, "A", fl_value_new_int((int) (color.alpha * 255)));
-
-  return map;
-}
-
-static FlValue* get_color_theme(GtkStyleContext* context) {
-  FlValue* colors = fl_value_new_map();
-
-  fl_value_set_string_take(colors, "accent", get_style_color(context, "accent_bg_color"));
-  fl_value_set_string_take(colors, "onAccent", get_style_color(context, "accent_fg_color"));
-
-  fl_value_set_string_take(colors, "outline", get_style_color(context, "borders"));
-
-  fl_value_set_string_take(colors, "primary", get_style_color(context, "theme_bg_color"));
-  fl_value_set_string_take(colors, "onPrimary", get_style_color(context, "theme_fg_color"));
-
-  fl_value_set_string_take(colors, "secondary", get_style_color(context, "warning_bg_color"));
-  fl_value_set_string_take(colors, "onSecondary", get_style_color(context, "warning_fg_color"));
-
-  fl_value_set_string_take(colors, "error", get_style_color(context, "error_bg_color"));
-  fl_value_set_string_take(colors, "onError", get_style_color(context, "error_fg_color"));
-
-  fl_value_set_string_take(colors, "surface", get_style_color(context, "window_bg_color"));
-  fl_value_set_string_take(colors, "onSurface", get_style_color(context, "window_fg_color"));
-
-  return colors;
-}
-
 #ifdef GTK_LAYER_SHELL_FOUND
 static void set_layer_anchor(GtkWindow* window, FlValue* arg, GtkLayerShellEdge edge) {
   gboolean to_edge = fl_value_get_bool(fl_value_lookup_string(arg, "toEdge"));
@@ -70,53 +33,7 @@ static void expidus_plugin_handle_method_call(
 
   const gchar* method = fl_method_call_get_name(method_call);
 
-  if (strcmp(method, "getSystemTheme") == 0) {
-    FlView* view = fl_plugin_registrar_get_view(self->registrar);
-
-    GtkSettings* settings = gtk_settings_get_for_screen(gtk_widget_get_screen(GTK_WIDGET(view)));
-
-    gchar* theme_name = nullptr;
-    gchar* font_name = nullptr;
-    gboolean prefer_dark = FALSE;
-    g_object_get(
-        G_OBJECT(settings),
-        "gtk-theme-name", &theme_name,
-        "gtk-font-name", &font_name,
-        "gtk-application-prefer-dark-theme", &prefer_dark,
-        nullptr);
-
-    GtkStyleContext* context = gtk_style_context_new();
-    gtk_style_context_add_provider(context, GTK_STYLE_PROVIDER(settings), GTK_STYLE_PROVIDER_PRIORITY_THEME);
-
-    g_autoptr(FlValue) theme = fl_value_new_map();
-
-    {
-      FlValue* theme_text = fl_value_new_map();
-
-      fl_value_set_string_take(theme_text, "font", fl_value_new_string(font_name));
-      fl_value_set_string_take(theme_text, "color", get_style_color(context, "theme_text_color"));
-
-      fl_value_set_string_take(theme, "text", theme_text);
-    }
-
-    {
-      FlValue* theme_appbar = fl_value_new_map();
-
-      fl_value_set_string_take(theme_appbar, "background", get_style_color(context, "headerbar_bg_color"));
-      fl_value_set_string_take(theme_appbar, "foreground", get_style_color(context, "headerbar_fg_color"));
-      fl_value_set_string_take(theme_appbar, "border", get_style_color(context, "headerbar_border_color"));
-      fl_value_set_string_take(theme_appbar, "shadow", get_style_color(context, "headerbar_shade_color"));
-
-      fl_value_set_string_take(theme, "appBar", theme_appbar);
-    }
-
-    fl_value_set_string_take(theme, "colorScheme", get_color_theme(context));
-    fl_value_set_string_take(theme, "dark", fl_value_new_bool(prefer_dark));
-
-    g_object_unref(context);
-
-    response = FL_METHOD_RESPONSE(fl_method_success_response_new(theme));
-  } else if (strcmp(method, "getHeaderBarLayout") == 0) {
+  if (strcmp(method, "getHeaderBarLayout") == 0) {
     FlView* view = fl_plugin_registrar_get_view(self->registrar);
 
     GtkSettings* settings = gtk_settings_get_for_screen(gtk_widget_get_screen(GTK_WIDGET(view)));

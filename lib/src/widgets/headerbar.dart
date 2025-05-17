@@ -142,7 +142,10 @@ class _HeaderBarState extends State<HeaderBar> {
                   decoration: ShapeDecoration(
                     color: Theme.of(context).appBarTheme.backgroundColor,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(8.0),
+                        topRight: Radius.circular(8.0),
+                      ),
                     ),
                   ),
                   height: 50,
