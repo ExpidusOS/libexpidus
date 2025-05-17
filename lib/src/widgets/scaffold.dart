@@ -70,7 +70,7 @@ class _ExpidusScaffoldState extends State<ExpidusScaffold> {
 
     WidgetsBinding.instance!.addPostFrameCallback((_) {
       final isMobile = MediaQuery.sizeOf(context).width <=
-          (widget.viewSwitcherConstraint ?? 600);
+          (widget.viewSwitcherConstraint ?? 650);
       if (isMobile && _flapController!.isOpen) {
         if (_flapController!.context != null) {
           _flapController!.close();
@@ -84,14 +84,18 @@ class _ExpidusScaffoldState extends State<ExpidusScaffold> {
     final widgetsApp = context.findAncestorWidgetOfExactType<WidgetsApp>()!;
 
     final isMobile = MediaQuery.sizeOf(context).width <=
-        (widget.viewSwitcherConstraint ?? 600);
+        (widget.viewSwitcherConstraint ?? 650);
     final isFlapVisible = widget.flap != null;
     final isViewSwitcherVisible = widget.viewSwitcher != null;
 
     final flap = isFlapVisible
-        ? SizedBox(
-            width: 200,
+        ? Padding(
+            padding: const EdgeInsets.all(8),
             child: Drawer(
+              width: double.infinity,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
               elevation: 25,
               child: widget.flap!(true),
             ),
@@ -149,9 +153,13 @@ class _ExpidusScaffoldState extends State<ExpidusScaffold> {
                 endDrawer: flap,
                 body: isFlapVisible
                     ? Flap(
-                        flap: widget.flap!(false),
+                        flap: Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: widget.flap!(false),
+                        ),
                         controller: widget.flapController,
                         options: widget.flapOptions,
+                        viewSwitcherConstraint: widget.viewSwitcherConstraint ?? 650.0,
                         child: widget.body,
                       )
                     : widget.body,

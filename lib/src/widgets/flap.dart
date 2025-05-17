@@ -30,6 +30,8 @@ class Flap extends StatefulWidget {
     super.key,
     required this.flap,
     required this.child,
+    this.width = 290.0,
+    this.viewSwitcherConstraint = 650.0,
     this.separator,
     this.controller,
     FlapOptions? options,
@@ -42,6 +44,9 @@ class Flap extends StatefulWidget {
   final Widget? child;
 
   final Widget? separator;
+
+  final double width;
+  final double viewSwitcherConstraint;
 
   /// The options for this flap
   final FlapOptions options;
@@ -106,7 +111,7 @@ class _FlapState extends State<Flap> {
 
     final flap = SlideHide(
       isHidden: _controller.shouldHide(),
-      width: 270,
+      width: widget.width,
       child: SingleChildScrollView(
         physics: const NeverScrollableScrollPhysics(),
         scrollDirection: Axis.horizontal,
@@ -137,7 +142,7 @@ class _FlapState extends State<Flap> {
           // affected by window resizes.
           // If FoldPolicy is auto, then close / open the sidebar depending on the
           // state
-          final isMobile = size.width < 900.0;
+          final isMobile = size.width < widget.viewSwitcherConstraint;
           _controller.updateModalState(context, state: isMobile);
           if (!widget.options.visible) return;
           switch (widget.options.foldPolicy) {

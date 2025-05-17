@@ -35,6 +35,7 @@ class ExpidusThemeManagerState extends State<ExpidusThemeManager> {
     );
     return base.copyWith(
       surface: base.background,
+      surfaceContainer: Color.lerp(base.surface, base.background, isDark ? 5 : -3),
     );
   }
 
