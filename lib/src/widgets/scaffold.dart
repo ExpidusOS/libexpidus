@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart'
-    show defaultTargetPlatform, TargetPlatform;
+    show defaultTargetPlatform, TargetPlatform, kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:libadwaita/libadwaita.dart' hide FlapOptions;
@@ -12,8 +12,56 @@ typedef WrapWidgetCallback = Widget Function(
 
 Widget _passthruWidgetCallback(BuildContext _, Widget child) => child;
 
+class _DispatchNavigatorObserver extends NavigatorObserver {
+  _DispatchNavigatorObserver({
+    this.onChangeTop,
+    this.onPop,
+    this.onPush,
+    this.onRemove,
+    this.onReplace,
+    this.onStartUserGesture,
+    this.onStopUserGesture,
+  });
+
+  final void Function(Route topRoute, Route? previousTopRoute)? onChangeTop;
+  final void Function(Route<dynamic> route, Route<dynamic>? previousRoute)? onPop;
+  final void Function(Route<dynamic> route, Route<dynamic>? previousRoute)? onPush;
+  final void Function(Route<dynamic> route, Route<dynamic>? previousRoute)? onRemove;
+  final void Function({Route<dynamic>? newRoute, Route<dynamic>? oldRoute})? onReplace;
+  final void Function(Route<dynamic> route, Route<dynamic>? previousRoute)? onStartUserGesture;
+  final VoidCallback? onStopUserGesture;
+
+  void didChangeTop(Route topRoute, Route? previousTopRoute) {
+    if (onChangeTop != null) onChangeTop!(topRoute, previousTopRoute);
+  }
+
+  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    if (onPop != null) onPop!(route, previousRoute);
+  }
+
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    if (onPush != null) onPush!(route, previousRoute);
+  }
+
+  void didRemove(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    if (onRemove != null) onRemove!(route, previousRoute);
+  }
+
+  void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
+    if (onReplace != null) onReplace!(newRoute: newRoute, oldRoute: oldRoute);
+  }
+
+  void didStartUserGesture(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    if (onStartUserGesture != null) onStartUserGesture!(route, previousRoute);
+  }
+
+  void didStopUserGesture() {
+    if (onStopUserGesture != null) onStopUserGesture!();
+  }
+}
+
 class ExpidusScaffold extends StatefulWidget {
-  const ExpidusScaffold({
+  ExpidusScaffold({
     super.key,
     this.scaffoldKey,
     this.title,
@@ -34,13 +82,30 @@ class ExpidusScaffold extends StatefulWidget {
     this.backgroundImage,
     this.transparentBody,
     this.body,
-  });
+    this.initialRoute,
+    this.onUnknownRoute,
+    this.onGenerateRoute,
+    this.onGenerateInitialRoutes,
+    this.navigatorObservers,
+    this.routes = const <String, WidgetBuilder>{},
+    this.navigatorKey,
+    this.onRouteChanged,
+  }) : assert(
+         body == null || onGenerateInitialRoutes == null,
+         'If onGenerateInitialRoutes is specified, the home argument will be '
+         'redundant.',
+       ),
+       assert(
+         body == null || !routes.containsKey(Navigator.defaultRouteName),
+         'If the body property is specified, the routes table '
+         'cannot include an entry for "/", since it would be redundant.',
+       );
 
   final Key? scaffoldKey;
   final Widget? titleWidget;
   final String? title;
   final GenerateAppTitle? onGenerateTitle;
-  final Widget Function(bool isDrawer)? flap;
+  final Widget Function(NavigatorState nav, bool isDrawer)? flap;
   final FlapController? flapController;
   final FlapOptions? flapOptions;
   final Widget? viewSwitcher;
@@ -55,6 +120,14 @@ class ExpidusScaffold extends StatefulWidget {
   final DecorationImage? backgroundImage;
   final bool? transparentBody;
   final Widget? body;
+  final Map<String, WidgetBuilder> routes;
+  final RouteFactory? onUnknownRoute;
+  final RouteFactory? onGenerateRoute;
+  final String? initialRoute;
+  final InitialRouteListFactory? onGenerateInitialRoutes;
+  final List<NavigatorObserver>? navigatorObservers;
+  final GlobalKey<NavigatorState>? navigatorKey;
+  final void Function(Route? route)? onRouteChanged;
 
   @override
   State<ExpidusScaffold> createState() => _ExpidusScaffoldState();
@@ -62,6 +135,81 @@ class ExpidusScaffold extends StatefulWidget {
 
 class _ExpidusScaffoldState extends State<ExpidusScaffold> {
   FlapController? _flapController;
+  GlobalKey<NavigatorState> _navigator = GlobalKey();
+  Route? _currentRoute;
+
+  GlobalKey<NavigatorState> get navigator => widget.navigatorKey ?? _navigator;
+
+  String get _initialRouteName =>
+      WidgetsBinding.instance.platformDispatcher.defaultRouteName != Navigator.defaultRouteName
+          ? WidgetsBinding.instance.platformDispatcher.defaultRouteName
+          : widget.initialRoute ?? WidgetsBinding.instance.platformDispatcher.defaultRouteName;
+
+  void _routeChanged(Route? value) {
+    _currentRoute = value;
+    if (widget.onRouteChanged != null) {
+      widget.onRouteChanged!(value);
+    }
+
+    // NOTE: Ugly hack to make the menu button rebuild.
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      setState(() {});
+    });
+  }
+
+  Route<dynamic>? _onGenerateRoute(RouteSettings settings) {
+    final String? name = settings.name;
+    final WidgetBuilder? pageContentBuilder =
+        name == Navigator.defaultRouteName && widget.body != null
+            ? (BuildContext context) => widget.body!
+            : widget.routes![name];
+
+    Route? value;
+    if (pageContentBuilder != null) {
+      value = MaterialPageRoute<dynamic>(settings: settings, builder: pageContentBuilder);
+    } else if (widget.onGenerateRoute != null) {
+      value = widget.onGenerateRoute!(settings);
+    } else {
+      value = null;
+    }
+    return value;
+  }
+
+  Route<dynamic> _onUnknownRoute(RouteSettings settings) {
+    assert(() {
+      if (widget.onUnknownRoute == null) {
+        throw FlutterError(
+          'Could not find a generator for route $settings in the $runtimeType.\n'
+          'Make sure your root app widget has provided a way to generate \n'
+          'this route.\n'
+          'Generators for routes are searched for in the following order:\n'
+          ' 1. For the "/" route, the "home" property, if non-null, is used.\n'
+          ' 2. Otherwise, the "routes" table is used, if it has an entry for '
+          'the route.\n'
+          ' 3. Otherwise, onGenerateRoute is called. It should return a '
+          'non-null value for any valid route not handled by "home" and "routes".\n'
+          ' 4. Finally if all else fails onUnknownRoute is called.\n'
+          'Unfortunately, onUnknownRoute was not set.',
+        );
+      }
+      return true;
+    }());
+    final Route<dynamic>? result = widget.onUnknownRoute!(settings);
+    assert(() {
+      if (result == null) {
+        throw FlutterError(
+          'The onUnknownRoute callback returned null.\n'
+          'When the $runtimeType requested the route $settings from its '
+          'onUnknownRoute callback, the callback returned null. Such callbacks '
+          'must never return null.',
+        );
+      }
+      return true;
+    }());
+    return result!;
+  }
+
+  Widget? _buildFlap(bool isDrawer) => navigator.currentState != null ? widget.flap!(navigator.currentState!, isDrawer) : null;
 
   @override
   void initState() {
@@ -97,7 +245,7 @@ class _ExpidusScaffoldState extends State<ExpidusScaffold> {
                 borderRadius: BorderRadius.circular(8),
               ),
               elevation: 25,
-              child: widget.flap!(true),
+              child: _buildFlap(true),
             ),
           )
         : null;
@@ -105,6 +253,32 @@ class _ExpidusScaffoldState extends State<ExpidusScaffold> {
     final onGenerateTitle =
         widget.onGenerateTitle ?? widgetsApp.onGenerateTitle;
     final title = widget.title ?? widgetsApp.title ?? '';
+
+    Widget body = Navigator(
+      clipBehavior: Clip.none,
+      restorationScopeId: 'nav',
+      key: navigator,
+      initialRoute: _initialRouteName,
+      onGenerateRoute: _onGenerateRoute,
+      onGenerateInitialRoutes:
+        widget.onGenerateInitialRoutes == null
+          ? Navigator.defaultGenerateInitialRoutes
+          : (NavigatorState navigator, String initialRouteName) {
+            return widget.onGenerateInitialRoutes!(initialRouteName);
+          },
+      onUnknownRoute: _onUnknownRoute,
+      observers: [
+        _DispatchNavigatorObserver(
+          onChangeTop: (top, _) => _routeChanged(top),
+          onPush: (route, _) => _routeChanged(route),
+          onPop: (route, _) => _routeChanged(route),
+        ),
+        ...(widget.navigatorObservers ?? []),
+      ],
+      routeTraversalEdgeBehavior:
+        kIsWeb ? TraversalEdgeBehavior.leaveFlutterView : TraversalEdgeBehavior.parentScope,
+      reportsRouteUpdateToEngine: true,
+    );
 
     return SafeArea(
       child: Container(
@@ -136,6 +310,12 @@ class _ExpidusScaffoldState extends State<ExpidusScaffold> {
                           showActions: widget.showActions,
                           hasDrawer: isFlapVisible,
                           onDrawerToggle: () => _flapController!.toggle(),
+                          onBackPressed: () {
+                            if (navigator.currentState != null) {
+                              navigator.currentState!.maybePop();
+                            }
+                          },
+                          route: _currentRoute,
                         )),
                   ),
             Expanded(
@@ -155,14 +335,14 @@ class _ExpidusScaffoldState extends State<ExpidusScaffold> {
                     ? Flap(
                         flap: Padding(
                           padding: const EdgeInsets.all(8),
-                          child: widget.flap!(false),
+                          child: _buildFlap(false),
                         ),
                         controller: widget.flapController,
                         options: widget.flapOptions,
                         viewSwitcherConstraint: widget.viewSwitcherConstraint ?? 650.0,
-                        child: widget.body,
+                        child: body,
                       )
-                    : widget.body,
+                    : body,
                 bottomNavigationBar: isViewSwitcherVisible && isMobile
                     ? Container(
                         height: 51,

@@ -220,6 +220,9 @@ class Button extends StatefulWidget {
     ButtonStatus status, {
     bool opaque = false,
   }) {
+    if (status == ButtonStatus.enabled) {
+      return null;
+    }
     return (backgroundColor ??
             Theme.of(context).buttonTheme?.colorScheme?.primary ??
             Theme.of(context).colorScheme!.primary!)

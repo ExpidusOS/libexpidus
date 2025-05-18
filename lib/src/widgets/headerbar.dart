@@ -16,7 +16,9 @@ class HeaderBar extends StatefulWidget {
     this.end = const [],
     this.hasDrawer = false,
     this.onDrawerToggle,
+    this.onBackPressed,
     this.showActions,
+    this.route,
   });
 
   final String? title;
@@ -26,7 +28,9 @@ class HeaderBar extends StatefulWidget {
   final List<Widget> end;
   final bool hasDrawer;
   final VoidCallback? onDrawerToggle;
+  final VoidCallback? onBackPressed;
   final bool? showActions;
+  final Route? route;
 
   @override
   State<HeaderBar> createState() => _HeaderBarState();
@@ -88,17 +92,14 @@ class _HeaderBarState extends State<HeaderBar> {
           final bool hasDrawer =
               widget.hasDrawer ?? scaffold?.hasDrawer ?? false;
 
-          final ModalRoute<dynamic>? parentRoute = ModalRoute.of(context);
+          final ModalRoute<dynamic>? parentRoute = (widget.route is ModalRoute) ? widget.route as ModalRoute : ModalRoute.of(context);
           final bool useCloseButton =
               parentRoute is PageRoute<dynamic> && parentRoute.fullscreenDialog;
 
           final windowButtons = <String, Widget?>{
-            'menu': hasDrawer
-                ? DrawerButton(onPressed: widget.onDrawerToggle)
-                : (parentRoute?.impliesAppBarDismissal ??
+            'menu': parentRoute?.impliesAppBarDismissal ??
                         false && !useCloseButton
-                    ? const BackButton()
-                    : null),
+                    ? BackButton(onPressed: widget.onBackPressed) : (hasDrawer ? DrawerButton(onPressed: widget.onDrawerToggle) : null),
             'maximize': _showActions(context)
                 ? AdwWindowButton(
                     nativeControls: true,

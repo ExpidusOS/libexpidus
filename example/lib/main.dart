@@ -1,19 +1,26 @@
 import 'package:expidus/expidus.dart';
+import 'views/nav_view.dart';
+import 'views/welcome.dart';
 
 void main() {
-  runApp(const ExpidusAppConfig(const MyApp()));
+  runApp(const ExpidusAppConfig(const ExampleApp()));
 }
 
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+class ExampleApp extends StatefulWidget {
+  const ExampleApp({super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  State<ExampleApp> createState() => _ExampleAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _ExampleAppState extends State<ExampleApp> {
   late FlapController _flapController;
-  int clicks = 0;
+  int _currentIndex = 0;
+
+  static final _routes = <String, WidgetBuilder>{
+    '/': (context) => const WelcomePage(),
+    '/nav': (context) => const NavViewPage(),
+  };
 
   @override
   void initState() {
@@ -28,34 +35,28 @@ class _MyAppState extends State<MyApp> {
         title: 'ExpidusOS Example Application',
         home: ExpidusScaffold(
           flapController: _flapController,
-          flap: (isDrawer) => Sidebar(
+          onRouteChanged: (route) {
+            _currentIndex = _routes.keys.toList().indexOf(route!.settings.name!);
+          },
+          flap: (nav, isDrawer) => Sidebar(
             isDrawer: isDrawer,
-            currentIndex: 0,
+            currentIndex: _currentIndex,
             children: [
               SidebarItem(
-                label: 'Home',
+                label: 'Welcome',
+              ),
+              SidebarItem(
+                label: 'Navigation View',
               ),
             ],
-            onSelected: (i) => {},
+            onSelected: (i) {
+              setState(() {
+                _currentIndex = i;
+                nav.pushNamed(_routes.keys.toList()[i]);
+              });
+            },
           ),
-          body: Center(
-            child: Column(
-              children: [
-                const Spacer(),
-                Text(
-                    'You have pressed the button $clicks time${clicks != 1 ? 's' : ''}'),
-                Button(
-                  child: const Text('+1'),
-                  onPressed: () {
-                    setState(() {
-                      clicks++;
-                    });
-                  },
-                ),
-                const Spacer(),
-              ],
-            ),
-          ),
+          routes: _routes,
         ),
       );
 }
