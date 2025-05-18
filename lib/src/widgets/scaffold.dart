@@ -24,11 +24,16 @@ class _DispatchNavigatorObserver extends NavigatorObserver {
   });
 
   final void Function(Route topRoute, Route? previousTopRoute)? onChangeTop;
-  final void Function(Route<dynamic> route, Route<dynamic>? previousRoute)? onPop;
-  final void Function(Route<dynamic> route, Route<dynamic>? previousRoute)? onPush;
-  final void Function(Route<dynamic> route, Route<dynamic>? previousRoute)? onRemove;
-  final void Function({Route<dynamic>? newRoute, Route<dynamic>? oldRoute})? onReplace;
-  final void Function(Route<dynamic> route, Route<dynamic>? previousRoute)? onStartUserGesture;
+  final void Function(Route<dynamic> route, Route<dynamic>? previousRoute)?
+      onPop;
+  final void Function(Route<dynamic> route, Route<dynamic>? previousRoute)?
+      onPush;
+  final void Function(Route<dynamic> route, Route<dynamic>? previousRoute)?
+      onRemove;
+  final void Function({Route<dynamic>? newRoute, Route<dynamic>? oldRoute})?
+      onReplace;
+  final void Function(Route<dynamic> route, Route<dynamic>? previousRoute)?
+      onStartUserGesture;
   final VoidCallback? onStopUserGesture;
 
   void didChangeTop(Route topRoute, Route? previousTopRoute) {
@@ -51,7 +56,8 @@ class _DispatchNavigatorObserver extends NavigatorObserver {
     if (onReplace != null) onReplace!(newRoute: newRoute, oldRoute: oldRoute);
   }
 
-  void didStartUserGesture(Route<dynamic> route, Route<dynamic>? previousRoute) {
+  void didStartUserGesture(
+      Route<dynamic> route, Route<dynamic>? previousRoute) {
     if (onStartUserGesture != null) onStartUserGesture!(route, previousRoute);
   }
 
@@ -90,16 +96,16 @@ class ExpidusScaffold extends StatefulWidget {
     this.routes = const <String, WidgetBuilder>{},
     this.navigatorKey,
     this.onRouteChanged,
-  }) : assert(
-         body == null || onGenerateInitialRoutes == null,
-         'If onGenerateInitialRoutes is specified, the home argument will be '
-         'redundant.',
-       ),
-       assert(
-         body == null || !routes.containsKey(Navigator.defaultRouteName),
-         'If the body property is specified, the routes table '
-         'cannot include an entry for "/", since it would be redundant.',
-       );
+  })  : assert(
+          body == null || onGenerateInitialRoutes == null,
+          'If onGenerateInitialRoutes is specified, the home argument will be '
+          'redundant.',
+        ),
+        assert(
+          body == null || !routes.containsKey(Navigator.defaultRouteName),
+          'If the body property is specified, the routes table '
+          'cannot include an entry for "/", since it would be redundant.',
+        );
 
   final Key? scaffoldKey;
   final Widget? titleWidget;
@@ -141,9 +147,11 @@ class _ExpidusScaffoldState extends State<ExpidusScaffold> {
   GlobalKey<NavigatorState> get navigator => widget.navigatorKey ?? _navigator;
 
   String get _initialRouteName =>
-      WidgetsBinding.instance.platformDispatcher.defaultRouteName != Navigator.defaultRouteName
+      WidgetsBinding.instance.platformDispatcher.defaultRouteName !=
+              Navigator.defaultRouteName
           ? WidgetsBinding.instance.platformDispatcher.defaultRouteName
-          : widget.initialRoute ?? WidgetsBinding.instance.platformDispatcher.defaultRouteName;
+          : widget.initialRoute ??
+              WidgetsBinding.instance.platformDispatcher.defaultRouteName;
 
   void _routeChanged(Route? value) {
     _currentRoute = value;
@@ -166,7 +174,8 @@ class _ExpidusScaffoldState extends State<ExpidusScaffold> {
 
     Route? value;
     if (pageContentBuilder != null) {
-      value = MaterialPageRoute<dynamic>(settings: settings, builder: pageContentBuilder);
+      value = MaterialPageRoute<dynamic>(
+          settings: settings, builder: pageContentBuilder);
     } else if (widget.onGenerateRoute != null) {
       value = widget.onGenerateRoute!(settings);
     } else {
@@ -209,7 +218,9 @@ class _ExpidusScaffoldState extends State<ExpidusScaffold> {
     return result!;
   }
 
-  Widget? _buildFlap(bool isDrawer) => navigator.currentState != null ? widget.flap!(navigator.currentState!, isDrawer) : null;
+  Widget? _buildFlap(bool isDrawer) => navigator.currentState != null
+      ? widget.flap!(navigator.currentState!, isDrawer)
+      : null;
 
   @override
   void initState() {
@@ -260,12 +271,11 @@ class _ExpidusScaffoldState extends State<ExpidusScaffold> {
       key: navigator,
       initialRoute: _initialRouteName,
       onGenerateRoute: _onGenerateRoute,
-      onGenerateInitialRoutes:
-        widget.onGenerateInitialRoutes == null
+      onGenerateInitialRoutes: widget.onGenerateInitialRoutes == null
           ? Navigator.defaultGenerateInitialRoutes
           : (NavigatorState navigator, String initialRouteName) {
-            return widget.onGenerateInitialRoutes!(initialRouteName);
-          },
+              return widget.onGenerateInitialRoutes!(initialRouteName);
+            },
       onUnknownRoute: _onUnknownRoute,
       observers: [
         _DispatchNavigatorObserver(
@@ -275,8 +285,9 @@ class _ExpidusScaffoldState extends State<ExpidusScaffold> {
         ),
         ...(widget.navigatorObservers ?? []),
       ],
-      routeTraversalEdgeBehavior:
-        kIsWeb ? TraversalEdgeBehavior.leaveFlutterView : TraversalEdgeBehavior.parentScope,
+      routeTraversalEdgeBehavior: kIsWeb
+          ? TraversalEdgeBehavior.leaveFlutterView
+          : TraversalEdgeBehavior.parentScope,
       reportsRouteUpdateToEngine: true,
     );
 
@@ -339,7 +350,8 @@ class _ExpidusScaffoldState extends State<ExpidusScaffold> {
                         ),
                         controller: widget.flapController,
                         options: widget.flapOptions,
-                        viewSwitcherConstraint: widget.viewSwitcherConstraint ?? 650.0,
+                        viewSwitcherConstraint:
+                            widget.viewSwitcherConstraint ?? 650.0,
                         child: body,
                       )
                     : body,

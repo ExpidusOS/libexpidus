@@ -36,7 +36,8 @@ class _ExampleAppState extends State<ExampleApp> {
         home: ExpidusScaffold(
           flapController: _flapController,
           onRouteChanged: (route) {
-            _currentIndex = _routes.keys.toList().indexOf(route!.settings.name!);
+            _currentIndex =
+                _routes.keys.toList().indexOf(route!.settings.name!);
           },
           flap: (nav, isDrawer) => Sidebar(
             isDrawer: isDrawer,

@@ -92,14 +92,19 @@ class _HeaderBarState extends State<HeaderBar> {
           final bool hasDrawer =
               widget.hasDrawer ?? scaffold?.hasDrawer ?? false;
 
-          final ModalRoute<dynamic>? parentRoute = (widget.route is ModalRoute) ? widget.route as ModalRoute : ModalRoute.of(context);
+          final ModalRoute<dynamic>? parentRoute = (widget.route is ModalRoute)
+              ? widget.route as ModalRoute
+              : ModalRoute.of(context);
           final bool useCloseButton =
               parentRoute is PageRoute<dynamic> && parentRoute.fullscreenDialog;
 
           final windowButtons = <String, Widget?>{
-            'menu': parentRoute?.impliesAppBarDismissal ??
-                        false && !useCloseButton
-                    ? BackButton(onPressed: widget.onBackPressed) : (hasDrawer ? DrawerButton(onPressed: widget.onDrawerToggle) : null),
+            'menu':
+                parentRoute?.impliesAppBarDismissal ?? false && !useCloseButton
+                    ? BackButton(onPressed: widget.onBackPressed)
+                    : (hasDrawer
+                        ? DrawerButton(onPressed: widget.onDrawerToggle)
+                        : null),
             'maximize': _showActions(context)
                 ? AdwWindowButton(
                     nativeControls: true,

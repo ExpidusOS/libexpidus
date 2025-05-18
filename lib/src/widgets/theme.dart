@@ -27,22 +27,26 @@ class ExpidusThemeManagerState extends State<ExpidusThemeManager> {
     final isDark = brightness == Brightness.dark;
     final base = ColorScheme.fromSwatch(
       brightness: brightness,
-      primarySwatch: isDark ? const MaterialColor(0xff9aa5ce, {}) : const MaterialColor(0xff40434f, {}),
+      primarySwatch: isDark
+          ? const MaterialColor(0xff9aa5ce, {})
+          : const MaterialColor(0xff40434f, {}),
       accentColor: isDark ? const Color(0xff7dcfff) : const Color(0xff0f4b6e),
       cardColor: isDark ? const Color(0xff161720) : const Color(0xffdadbdf),
-      backgroundColor: isDark ? const Color(0xff1a1b26) : const Color(0xffe6e7ed),
+      backgroundColor:
+          isDark ? const Color(0xff1a1b26) : const Color(0xffe6e7ed),
       errorColor: isDark ? const Color(0xfff7768e) : const Color(0xff8c4351),
     );
     return base.copyWith(
       surface: base.background,
-      surfaceContainer: Color.lerp(base.surface, base.background, isDark ? 5 : -3),
+      surfaceContainer:
+          Color.lerp(base.surface, base.background, isDark ? 5 : -3),
     );
   }
 
   ThemeData _themeFor(Brightness brightness) {
     final base = brightness == Brightness.dark
-      ? AdwaitaThemeData.dark()
-      : AdwaitaThemeData.light();
+        ? AdwaitaThemeData.dark()
+        : AdwaitaThemeData.light();
     final colorScheme = _colorSchemeFor(brightness);
     return base.copyWith(
       colorScheme: colorScheme,
