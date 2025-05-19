@@ -27,6 +27,7 @@ export 'package:libadwaita/src/widgets/adw/flap.dart'
 
 export 'widgets/app.dart';
 export 'widgets/button.dart';
+export 'widgets/dialog.dart';
 export 'widgets/digital_clock.dart';
 export 'widgets/flap.dart';
 export 'widgets/headerbar.dart';

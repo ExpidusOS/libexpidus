@@ -64,6 +64,9 @@ class ExpidusThemeManagerState extends State<ExpidusThemeManager> {
       ),
       canvasColor: colorScheme.background,
       scaffoldBackgroundColor: colorScheme.background,
+      dialogTheme: base.dialogTheme.copyWith(
+        backgroundColor: colorScheme.surface,
+      ),
     );
   }
 

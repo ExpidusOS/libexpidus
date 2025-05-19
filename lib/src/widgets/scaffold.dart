@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:libadwaita/libadwaita.dart' hide FlapOptions;
 import 'package:libadwaita_bitsdojo/libadwaita_bitsdojo.dart';
+import 'dispatch_nav_observer.dart';
 import 'flap.dart';
 import 'headerbar.dart';
 
@@ -11,60 +12,6 @@ typedef WrapWidgetCallback = Widget Function(
     BuildContext context, Widget child);
 
 Widget _passthruWidgetCallback(BuildContext _, Widget child) => child;
-
-class _DispatchNavigatorObserver extends NavigatorObserver {
-  _DispatchNavigatorObserver({
-    this.onChangeTop,
-    this.onPop,
-    this.onPush,
-    this.onRemove,
-    this.onReplace,
-    this.onStartUserGesture,
-    this.onStopUserGesture,
-  });
-
-  final void Function(Route topRoute, Route? previousTopRoute)? onChangeTop;
-  final void Function(Route<dynamic> route, Route<dynamic>? previousRoute)?
-      onPop;
-  final void Function(Route<dynamic> route, Route<dynamic>? previousRoute)?
-      onPush;
-  final void Function(Route<dynamic> route, Route<dynamic>? previousRoute)?
-      onRemove;
-  final void Function({Route<dynamic>? newRoute, Route<dynamic>? oldRoute})?
-      onReplace;
-  final void Function(Route<dynamic> route, Route<dynamic>? previousRoute)?
-      onStartUserGesture;
-  final VoidCallback? onStopUserGesture;
-
-  void didChangeTop(Route topRoute, Route? previousTopRoute) {
-    if (onChangeTop != null) onChangeTop!(topRoute, previousTopRoute);
-  }
-
-  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
-    if (onPop != null) onPop!(route, previousRoute);
-  }
-
-  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
-    if (onPush != null) onPush!(route, previousRoute);
-  }
-
-  void didRemove(Route<dynamic> route, Route<dynamic>? previousRoute) {
-    if (onRemove != null) onRemove!(route, previousRoute);
-  }
-
-  void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
-    if (onReplace != null) onReplace!(newRoute: newRoute, oldRoute: oldRoute);
-  }
-
-  void didStartUserGesture(
-      Route<dynamic> route, Route<dynamic>? previousRoute) {
-    if (onStartUserGesture != null) onStartUserGesture!(route, previousRoute);
-  }
-
-  void didStopUserGesture() {
-    if (onStopUserGesture != null) onStopUserGesture!();
-  }
-}
 
 class ExpidusScaffold extends StatefulWidget {
   ExpidusScaffold({
@@ -278,7 +225,7 @@ class _ExpidusScaffoldState extends State<ExpidusScaffold> {
             },
       onUnknownRoute: _onUnknownRoute,
       observers: [
-        _DispatchNavigatorObserver(
+        DispatchNavigatorObserver(
           onChangeTop: (top, _) => _routeChanged(top),
           onPush: (route, _) => _routeChanged(route),
           onPop: (route, _) => _routeChanged(route),
