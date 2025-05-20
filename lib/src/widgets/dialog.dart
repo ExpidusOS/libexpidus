@@ -1,6 +1,57 @@
 import 'package:flutter/material.dart' as material;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
+import 'package:libadwaita/libadwaita.dart';
+import 'package:libadwaita_core/libadwaita_core.dart';
+
+class DialogPage extends StatelessWidget {
+  const DialogPage({
+    super.key,
+    this.title,
+    this.titleWidget,
+    this.child,
+    this.onClose,
+  });
+
+  final String? title;
+  final Widget? titleWidget;
+  final Widget? child;
+  final VoidCallback? onClose;
+
+  @override
+  Widget build(BuildContext context) {
+    final ModalRoute<dynamic>? parentRoute = ModalRoute.of(context);
+    final bool useCloseButton =
+        parentRoute is PageRoute<dynamic> && parentRoute.fullscreenDialog;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        AdwHeaderBar(
+          start: [
+            if (parentRoute?.impliesAppBarDismissal ?? false && !useCloseButton)
+              material.BackButton(
+                onPressed: () {
+                  Navigator.maybePop(context);
+                },
+              ),
+          ],
+          title: titleWidget ?? (title != null ? Text(title!) : null),
+          actions: AdwActions(
+            onClose: onClose,
+          ),
+          style: const HeaderBarStyle(
+            autoPositionWindowButtons: false,
+            isTransparent: true,
+          ),
+        ),
+        Flexible(
+          child: child ?? const SizedBox(),
+        ),
+      ],
+    );
+  }
+}
 
 class Dialog extends StatelessWidget {
   const Dialog({
@@ -91,7 +142,6 @@ class Dialog extends StatelessWidget {
       borderRadius: BorderRadius.circular(12),
       child: Navigator(
         clipBehavior: Clip.none,
-        restorationScopeId: 'nav',
         initialRoute: _initialRouteName,
         onGenerateRoute: _onGenerateRoute,
         onGenerateInitialRoutes: onGenerateInitialRoutes == null
@@ -104,7 +154,6 @@ class Dialog extends StatelessWidget {
         routeTraversalEdgeBehavior: kIsWeb
             ? TraversalEdgeBehavior.leaveFlutterView
             : TraversalEdgeBehavior.parentScope,
-        reportsRouteUpdateToEngine: true,
       ),
     ),
   );
