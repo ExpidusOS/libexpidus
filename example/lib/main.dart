@@ -1,4 +1,6 @@
 import 'package:expidus/expidus.dart';
+import 'views/clamp.dart';
+import 'views/lists.dart';
 import 'views/nav_view.dart';
 import 'views/welcome.dart';
 
@@ -20,6 +22,8 @@ class _ExampleAppState extends State<ExampleApp> {
   static final _routes = <String, WidgetBuilder>{
     '/': (context) => const WelcomePage(),
     '/nav': (context) => const NavViewPage(),
+    '/clamp': (context) => const ClampPage(),
+    '/lists': (context) => const ListsPage(),
   };
 
   @override
@@ -48,6 +52,12 @@ class _ExampleAppState extends State<ExampleApp> {
               ),
               SidebarItem(
                 label: 'Navigation View',
+              ),
+              SidebarItem(
+                label: 'Clamp',
+              ),
+              SidebarItem(
+                label: 'Lists',
               ),
             ],
             onSelected: (i) {
