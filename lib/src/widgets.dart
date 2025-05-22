@@ -2,12 +2,15 @@ import 'package:libadwaita/libadwaita.dart' as adwaita;
 export 'package:flutter/material.dart'
     show
         Card,
+        Checkbox,
         Colors,
         CircularProgressIndicator,
         DialogRoute,
         DrawerButton,
         LinearProgressIndicator,
+        Icons,
         Material,
+        Radio,
         RefreshProgressIndicator,
         ScaffoldState,
         Scaffold,
@@ -27,6 +30,7 @@ export 'package:libadwaita/src/widgets/adw/flap.dart'
 
 export 'widgets/app.dart';
 export 'widgets/button.dart';
+export 'widgets/dialog.dart';
 export 'widgets/digital_clock.dart';
 export 'widgets/flap.dart';
 export 'widgets/headerbar.dart';
@@ -56,5 +60,6 @@ typedef ToggleButton = adwaita.GtkToggleButton;
 typedef ThumbPainer = adwaita.AdwThumbPainter;
 typedef ViewStack = adwaita.AdwViewStack;
 typedef ViewSwitcher = adwaita.AdwViewSwitcher;
+typedef ViewSwitcherData = adwaita.ViewSwitcherData;
 typedef ViewSwitcherTab = adwaita.AdwViewSwitcherTab;
 typedef WindowButton = adwaita.AdwWindowButton;

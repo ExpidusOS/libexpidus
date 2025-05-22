@@ -40,7 +40,7 @@ class Button extends StatefulWidget {
     this.boxShadow,
     this.animationDuration = const Duration(milliseconds: 200),
     this.animationCurve = Curves.easeOutQuad,
-    this.isActive = false,
+    this.isActive = true,
   }) : assert(
           builder != null || child != null,
           _bothBuilderAndChildError,
@@ -62,7 +62,7 @@ class Button extends StatefulWidget {
     this.boxShadow,
     this.animationDuration = const Duration(milliseconds: 200),
     this.animationCurve = Curves.easeOutQuad,
-    this.isActive = false,
+    this.isActive = true,
   })  : assert(builder != null || child != null, _bothBuilderAndChildError),
         constraints = BoxConstraints.tightFor(width: size, height: size),
         shape = BoxShape.circle,
@@ -84,7 +84,7 @@ class Button extends StatefulWidget {
     this.boxShadow,
     this.animationDuration = const Duration(milliseconds: 200),
     this.animationCurve = Curves.easeOutQuad,
-    this.isActive = false,
+    this.isActive = true,
   })  : borderRadius = const BorderRadius.all(
           Radius.circular(9999),
         ),
@@ -110,7 +110,7 @@ class Button extends StatefulWidget {
     this.boxShadow,
     this.animationDuration = const Duration(milliseconds: 200),
     this.animationCurve = Curves.easeOutQuad,
-    this.isActive = false,
+    this.isActive = true,
   })  : opaque = false,
         assert(builder != null || child != null, _bothBuilderAndChildError);
 
@@ -220,6 +220,9 @@ class Button extends StatefulWidget {
     ButtonStatus status, {
     bool opaque = false,
   }) {
+    if (status == ButtonStatus.enabled) {
+      return null;
+    }
     return (backgroundColor ??
             Theme.of(context).buttonTheme?.colorScheme?.primary ??
             Theme.of(context).colorScheme!.primary!)

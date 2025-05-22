@@ -7,11 +7,19 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, systems, flake-utils }@inputs:
-    flake-utils.lib.eachSystem (import systems) (system:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      systems,
+      flake-utils,
+    }@inputs:
+    flake-utils.lib.eachSystem (import systems) (
+      system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
-      in {
+      in
+      {
         devShells.default = pkgs.mkShell {
           packages = with pkgs; [
             flutter
@@ -22,5 +30,6 @@
             gdb
           ];
         };
-      });
+      }
+    );
 }

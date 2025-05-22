@@ -15,11 +15,11 @@ class Sidebar extends StatelessWidget {
     required this.currentIndex,
     required this.onSelected,
     this.borderRadius,
-    this.width = 270.0,
+    this.width = 280.0,
     this.color,
     this.isDrawer = false,
     this.controller,
-    this.padding = const EdgeInsets.symmetric(vertical: 6, horizontal: 6),
+    this.padding = const EdgeInsets.symmetric(vertical: 6, horizontal: 3),
     required List<SidebarItem> children,
   }) : _childrenDelegate = List.generate(
           children.length,
@@ -36,11 +36,11 @@ class Sidebar extends StatelessWidget {
     required this.currentIndex,
     required this.onSelected,
     this.borderRadius,
-    this.width = 270.0,
+    this.width = 280.0,
     this.color,
     this.isDrawer = false,
     this.controller,
-    this.padding = const EdgeInsets.symmetric(vertical: 6, horizontal: 6),
+    this.padding = const EdgeInsets.symmetric(vertical: 6, horizontal: 3),
     required SidebarItem Function(
       BuildContext context,
       int index,
@@ -80,7 +80,7 @@ class Sidebar extends StatelessWidget {
 
   /// The width of the sidebar.
   ///
-  /// Defaults to `270.0`.
+  /// Defaults to `280.0`.
   final double width;
 
   /// The background color of the sidebar.
@@ -95,9 +95,9 @@ class Sidebar extends StatelessWidget {
     return Container(
       constraints: BoxConstraints(maxWidth: width),
       decoration: ShapeDecoration(
-        color: color ?? Theme.of(context).colorScheme.primary,
+        color: color ?? Theme.of(context).colorScheme.surfaceContainer,
         shape: RoundedRectangleBorder(
-          borderRadius: borderRadius ?? BorderRadius.zero,
+          borderRadius: borderRadius ?? BorderRadius.circular(8),
         ),
       ),
       child: ListView(
@@ -171,7 +171,7 @@ class _SidebarItemBuilder extends StatelessWidget {
   Widget build(BuildContext context) {
     final currentItem = item(context);
 
-    return Button.flat(
+    return Button.pill(
       constraints: const BoxConstraints.tightFor(height: 36),
       margin: const EdgeInsets.only(bottom: 2),
       textStyle: Theme.of(context).textTheme.displayMedium ??
@@ -199,7 +199,7 @@ class _SidebarItemBuilder extends StatelessWidget {
                           fontSize: 15,
                         ))
                     .copyWith(
-                  color: Theme.of(context).colorScheme.onPrimary,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ),
         ],
