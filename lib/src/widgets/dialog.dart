@@ -135,26 +135,26 @@ class Dialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => material.Dialog(
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(12),
-    ),
-    child: ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: Navigator(
-        clipBehavior: Clip.none,
-        initialRoute: _initialRouteName,
-        onGenerateRoute: _onGenerateRoute,
-        onGenerateInitialRoutes: onGenerateInitialRoutes == null
-            ? Navigator.defaultGenerateInitialRoutes
-            : (NavigatorState navigator, String initialRouteName) {
-                return onGenerateInitialRoutes!(initialRouteName);
-              },
-        onUnknownRoute: _onUnknownRoute,
-        observers: navigatorObservers ?? [],
-        routeTraversalEdgeBehavior: kIsWeb
-            ? TraversalEdgeBehavior.leaveFlutterView
-            : TraversalEdgeBehavior.parentScope,
-      ),
-    ),
-  );
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Navigator(
+            clipBehavior: Clip.none,
+            initialRoute: _initialRouteName,
+            onGenerateRoute: _onGenerateRoute,
+            onGenerateInitialRoutes: onGenerateInitialRoutes == null
+                ? Navigator.defaultGenerateInitialRoutes
+                : (NavigatorState navigator, String initialRouteName) {
+                    return onGenerateInitialRoutes!(initialRouteName);
+                  },
+            onUnknownRoute: _onUnknownRoute,
+            observers: navigatorObservers ?? [],
+            routeTraversalEdgeBehavior: kIsWeb
+                ? TraversalEdgeBehavior.leaveFlutterView
+                : TraversalEdgeBehavior.parentScope,
+          ),
+        ),
+      );
 }
