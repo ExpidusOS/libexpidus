@@ -8,6 +8,7 @@ export 'package:flutter/material.dart'
         DialogRoute,
         DrawerButton,
         LinearProgressIndicator,
+        Icons,
         Material,
         Radio,
         RefreshProgressIndicator,
@@ -59,5 +60,6 @@ typedef ToggleButton = adwaita.GtkToggleButton;
 typedef ThumbPainer = adwaita.AdwThumbPainter;
 typedef ViewStack = adwaita.AdwViewStack;
 typedef ViewSwitcher = adwaita.AdwViewSwitcher;
+typedef ViewSwitcherData = adwaita.ViewSwitcherData;
 typedef ViewSwitcherTab = adwaita.AdwViewSwitcherTab;
 typedef WindowButton = adwaita.AdwWindowButton;

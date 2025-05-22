@@ -2,6 +2,7 @@ import 'package:expidus/expidus.dart';
 import 'views/clamp.dart';
 import 'views/lists.dart';
 import 'views/nav_view.dart';
+import 'views/view_switcher.dart';
 import 'views/welcome.dart';
 
 void main() {
@@ -24,6 +25,7 @@ class _ExampleAppState extends State<ExampleApp> {
     '/nav': (context) => const NavViewPage(),
     '/clamp': (context) => const ClampPage(),
     '/lists': (context) => const ListsPage(),
+    '/view': (context) => const ViewSwitcherPage(),
   };
 
   @override
@@ -58,6 +60,9 @@ class _ExampleAppState extends State<ExampleApp> {
               ),
               SidebarItem(
                 label: 'Lists',
+              ),
+              SidebarItem(
+                label: 'View Switcher',
               ),
             ],
             onSelected: (i) {

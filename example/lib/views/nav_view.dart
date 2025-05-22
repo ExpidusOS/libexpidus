@@ -100,7 +100,6 @@ class NavViewPage extends StatelessWidget {
         Text('Navigation View', style: Theme.of(context).textTheme.displayMedium),
         Text('A page-based navigation container.', style: Theme.of(context).textTheme.labelLarge),
         Button(
-          isActive: true,
           child: const Text('Run the demo'),
           onPressed: () {
             showDialog(
