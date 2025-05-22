@@ -2,12 +2,14 @@ import 'package:libadwaita/libadwaita.dart' as adwaita;
 export 'package:flutter/material.dart'
     show
         Card,
+        Checkbox,
         Colors,
         CircularProgressIndicator,
         DialogRoute,
         DrawerButton,
         LinearProgressIndicator,
         Material,
+        Radio,
         RefreshProgressIndicator,
         ScaffoldState,
         Scaffold,
