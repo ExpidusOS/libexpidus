@@ -17,6 +17,7 @@ class HeaderBar extends StatefulWidget {
     this.hasDrawer = false,
     this.onDrawerToggle,
     this.onBackPressed,
+    this.showMenuButton,
     this.showActions,
     this.route,
   });
@@ -29,6 +30,7 @@ class HeaderBar extends StatefulWidget {
   final bool hasDrawer;
   final VoidCallback? onDrawerToggle;
   final VoidCallback? onBackPressed;
+  final bool? showMenuButton;
   final bool? showActions;
   final Route? route;
 
@@ -100,9 +102,9 @@ class _HeaderBarState extends State<HeaderBar> {
 
           final windowButtons = <String, Widget?>{
             'menu':
-                parentRoute?.impliesAppBarDismissal ?? false && !useCloseButton
+                widget.showMenuButton ?? parentRoute?.impliesAppBarDismissal ?? false && !useCloseButton
                     ? BackButton(onPressed: widget.onBackPressed)
-                    : (hasDrawer
+                    : (widget.showMenuButton ?? hasDrawer
                         ? DrawerButton(onPressed: widget.onDrawerToggle)
                         : null),
             'maximize': _showActions(context)
